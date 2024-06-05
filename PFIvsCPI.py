@@ -315,3 +315,24 @@ for i in range(p):
 plt.tight_layout(rect=[0, 0, 1, 0.95]) 
 fig.savefig("CPIvsPFI_cond-indep.pdf")
 # %%
+
+# Plots
+fig, axs = plt.subplots(2,p)
+fig.suptitle("Conditionally independent covariate with CPI vs PFI",fontsize=16)
+for i in range(p):
+    axs[0, i].plot(noise_arr[0:7], imp3[0,0:7,i], label="CPI", linestyle="dashed")
+    axs[0, i].plot(noise_arr[0:7], imp3[1,0:7,i], label="PFI")
+    axs[0, i].set_title(r'Importance $\beta$'+str(i), fontsize=14)
+    axs[1, i].plot(noise_arr[0:7], -np.log10(pval3[0,0:7,i]+1e-10), label="CPI", linestyle="dashed")
+    axs[1, i].plot(noise_arr[0:7], -np.log10(pval3[1,0:7,i]+1e-10), label="PFI")
+    axs[1,i].axhline(y=-np.log10(0.05), color='r', linestyle='-')
+    axs[1, i].set_title(r'-log10(p_value) $\beta$'+str(i), fontsize=14)
+    axs[0,i].legend()
+    axs[1,i].legend()
+
+plt.tight_layout(rect=[0, 0, 1, 0.95]) 
+
+fig.savefig("CPIvsPFI_cond-indep_2.pdf")
+
+
+# %%
