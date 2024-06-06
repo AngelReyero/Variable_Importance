@@ -315,7 +315,10 @@ for i in range(p):
     axs[1,i].legend()
 
 plt.tight_layout(rect=[0, 0, 1, 0.95]) 
+fig.text(0.53, 0, r'$\lambda$', ha='center', va='center')
+
 fig.savefig("CPIvsPFI_cond-indep.pdf")
+
 # %%
 
 # Plots
