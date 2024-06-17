@@ -327,7 +327,7 @@ for i in range(p):
 plt.tight_layout(rect=[0, 0, 1, 0.95]) 
 fig.text(0.53, 0, r'$\rho$', ha='center', va='center')
 
-fig.savefig("visualization/plots_Angel/CPIvsPFIvsLOCO_diff-corr.pdf")
+fig.savefig("visualization/plots_Angel/CPIvsPFIvsLOCO_diff-corr.pdf", bbox_inches="tight")
 
 # %%
 
@@ -489,7 +489,7 @@ for i in range(p):
 plt.tight_layout(rect=[0, 0, 1, 0.95]) 
 fig.text(0.53, 0, r'$\lambda$', ha='center', va='center')
 
-fig.savefig("visualization/plots_Angel/CPIvsPFIvsLOCO_cond-indep.pdf")
+fig.savefig("visualization/plots_Angel/CPIvsPFIvsLOCO_cond-indep.pdf", bbox_inches="tight")
 
 # %%
 
@@ -512,7 +512,7 @@ for i in range(p):
 plt.tight_layout(rect=[0, 0, 1, 0.95]) 
 fig.text(0.53, 0, r'$\lambda$', ha='center', va='center')
 
-fig.savefig("CPIvsPFIvsLOCO_cond-indep.pdf")
+fig.savefig("CPIvsPFIvsLOCO_cond-indep.pdf", bbox_inches="tight")
 
 # %%
 
