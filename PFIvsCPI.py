@@ -160,8 +160,8 @@ for i in range(p):
 
 plt.tight_layout(rect=[0, 0, 1, 0.95]) 
 fig.text(0.53, 0, r'$n$', ha='center', va='center')
-fig.text(0.53, -0.05, " ", ha='center', va='center')
-fig.savefig("visualization/plots_Angel/CPIvsPFIvsLOCO_conv-rates.pdf")
+#fig.text(0.53, -0.05, " ", ha='center', va='center')
+fig.savefig("visualization/plots_Angel/CPIvsPFIvsLOCO_conv-rates.pdf", bbox_inches="tight")
 
 
 
