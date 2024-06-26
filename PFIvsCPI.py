@@ -606,7 +606,7 @@ snr=4
 p=2
 n=1000
 x = norm.rvs(size=(p, n), random_state=seed)
-intra_cor=[0, 0.05]#, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
+intra_cor=[0,0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
 imp2=np.zeros((4, len(intra_cor), 2))
 pval2=np.zeros((4, len(intra_cor), 2))
  # Determine beta coefficients
@@ -690,22 +690,24 @@ for (i,cor) in enumerate(intra_cor):
         pval2[2,i, j]=vimp.p_value_
     #LOCO Ahmad
     res_LOCO=compute_loco(data_enc, y)
-    imp2[3, i]=res_LOCO["importance"].reshape((2,))
-    pval2[3, i]=res_LOCO["pval"].reshape((2,))
+    imp2[3, i]=res_LOCO["val_imp"]
+    pval2[3, i]=res_LOCO["p_value"]
 
 
 #%%
 f_res={}
 f_res = pd.DataFrame(f_res)
-for i in range(3):#CPI, PFI, LOCO
+for i in range(4):#CPI, PFI, LOCO_W, LOCO_AC
     for j in range(len(intra_cor)):
         f_res1={}
         if i==0:
             f_res1["method"] = ["CPI"]
         elif i==1:
             f_res1["method"]=["PFI"]
-        else: 
+        elif i==2: 
             f_res1["method"]=["LOCO"]
+        else:
+            f_res1["method"]=["LOCO-AC"]
         f_res1["intra_cor"]=intra_cor[j]
         for k in range(len(list(data.columns))):
             f_res1["imp_V"+str(k)]=imp2[i, j, k]
