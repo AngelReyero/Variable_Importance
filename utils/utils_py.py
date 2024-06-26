@@ -10,7 +10,7 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from torch.utils.data import DataLoader
-from utils_lazy import *
+from utils.utils_lazy import *
 
 
 def compute_sage(X, y, ntree=100, seed=2021, prob_type="regression"):

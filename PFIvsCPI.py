@@ -13,7 +13,7 @@ from scipy.linalg import cholesky
 from scipy.stats import norm
 from sklearn.preprocessing import OneHotEncoder
 import vimpy
-#from .utils import compute_loco
+from utils.utils_py import compute_loco
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import GridSearchCV
 seed=2024
@@ -606,15 +606,15 @@ snr=4
 p=2
 n=1000
 x = norm.rvs(size=(p, n), random_state=seed)
-intra_cor=[0, 0.05, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
-imp2=np.zeros((3, len(intra_cor), 2))
-pval2=np.zeros((3, len(intra_cor), 2))
+intra_cor=[0, 0.05]#, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
+imp2=np.zeros((4, len(intra_cor), 2))
+pval2=np.zeros((4, len(intra_cor), 2))
  # Determine beta coefficients
 rng = np.random.RandomState(seed)
 n_signal=2
 #effectset = [-0.5, -1, -2, -3, 0.5, 1, 2, 3]
 #beta = rng.choice(effectset, size=(n_signal), replace=True)
-beta=np.array([-1,1])
+beta=np.array([2,1])
 for (i,cor) in enumerate(intra_cor):
     print("With correlation="+str(cor))
     #First we construct the sample with the third useless covariate with correlation=cor
@@ -688,6 +688,10 @@ for (i,cor) in enumerate(intra_cor):
         vimp.hypothesis_test(alpha = 0.05, delta = 0)
         imp2[2,i,j]=vimp.vimp_
         pval2[2,i, j]=vimp.p_value_
+    #LOCO Ahmad
+    res_LOCO=compute_loco(data_enc, y)
+    imp2[3, i]=res_LOCO["importance"].reshape((2,))
+    pval2[3, i]=res_LOCO["pval"].reshape((2,))
 
 
 #%%
@@ -717,7 +721,7 @@ f_res.to_csv(
 #%%
 
 # Visualization from the csv file
-beta=np.array([-1,1])
+beta=np.array([2,1])
 res_path = pathlib.Path('results/results_csv_Angel')
 list(res_path.glob('*.csv'))
 
