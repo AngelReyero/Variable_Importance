@@ -59,7 +59,7 @@ for (i,cor) in enumerate(intra_cor):
     bbi_model = BlockBasedImportance(
             estimator=None,
             do_hyper=True,
-            importance_estimator="Mod_RF",
+            importance_estimator=None,
             dict_hyper=None,
             conditional=True,
             group_stacking=False,
@@ -154,7 +154,7 @@ for i in range(p):
     for method, group in df.groupby('method'):
         axs[0, i].plot(group['intra_cor'], group['imp_V'+str(i)], label=method)
         axs[1, i].plot(group['intra_cor'], -np.log10(group['pval_V'+str(i)]+1e-10), label=method)
-    axs[0, i].plot(np.linspace(0,0.9, 50), beta[i]**2*(1-np.linspace(0,0.9, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1)
+    axs[0, i].plot(np.linspace(0,0.9, 50), 2*beta[i]**2*(1-np.linspace(0,0.9, 50)**2), label=r"$2\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1)
     axs[0, i].set_title(r'Importance $x$'+str(i), fontsize=14)
     axs[1,i].axhline(y=-np.log10(0.05), color='r', linestyle='--', linewidth=1)
     axs[1, i].set_title(r'-log10(p_value) $x$'+str(i), fontsize=14)
@@ -166,3 +166,5 @@ fig.text(0.53, 0, r'$\rho$', ha='center', va='center')
 
 fig.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-corr.pdf", bbox_inches="tight")
 
+
+# %%
