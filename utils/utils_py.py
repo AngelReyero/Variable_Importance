@@ -107,7 +107,7 @@ def compute_loco(X, y, ntree=100, seed=2021, prob_type="regression", dnn=False):
     clf_rf.fit(X.iloc[train_ind, :], y[train_ind])
 
     if prob_type == "regression":
-        loss = np.square(y[test_ind] - np.ravel(clf_rf.predict(X.iloc[test_ind, :])))
+        loss = (y[test_ind] - np.ravel(clf_rf.predict(X.iloc[test_ind, :])))**2
     else:
         y_test = (
             OneHotEncoder(handle_unknown="ignore")
@@ -122,24 +122,27 @@ def compute_loco(X, y, ntree=100, seed=2021, prob_type="regression", dnn=False):
     # Retrain model
 
     for col in range(X.shape[1]):
-        if dnn:
-            clf_rf = DNN_learner_single(
-                prob_type=prob_type,
-                do_hyper=True,
-                random_state=2023,
-                verbose=0,
-            )
+        if prob_type == "classification":
+            clf_rf2 = RandomForestClassifier(n_estimators=ntree, random_state=seed)
+        if prob_type == "regression":
+            if not dnn:
+                clf_rf2 = RandomForestRegressor(n_estimators=ntree, random_state=seed)
+            else:
+                clf_rf2 = DNN_learner_single(
+                    prob_type=prob_type,
+                    do_hyper=True,
+                    random_state=2023,
+                    verbose=0,
+                )
         print(f"Processing col: {col+1}")
         X_minus_idx = np.delete(np.copy(X), col, -1)
-        clf_rf.fit(X_minus_idx[train_ind, :], y[train_ind])
+        clf_rf2.fit(X_minus_idx[train_ind, :], y[train_ind])
 
         if prob_type == "regression":
-            loss0 = np.square(
-                y[test_ind] - np.ravel(clf_rf.predict(X_minus_idx[test_ind, :]))
-            )
+            loss0 = (y[test_ind] - np.ravel(clf_rf2.predict(X_minus_idx[test_ind, :])))**2
         else:
             loss0 = np.sum(
-                y_test * np.log(clf_rf.predict_proba(X_minus_idx[test_ind, :])), axis=1
+                y_test * np.log(clf_rf2.predict_proba(X_minus_idx[test_ind, :])), axis=1
             )
         delta = loss0 - loss
 
@@ -148,7 +151,7 @@ def compute_loco(X, y, ntree=100, seed=2021, prob_type="regression", dnn=False):
             t_statistic = 0
         if np.isnan(p_value):
             p_value = 1
-        dict_vals["val_imp"].append(t_statistic)
+        dict_vals["val_imp"].append(np.mean(delta))
         dict_vals["p_value"].append(p_value)
 
     return dict_vals
