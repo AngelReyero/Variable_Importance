@@ -19,10 +19,10 @@ from sklearn.model_selection import GridSearchCV
 seed=2024
 
 #%%
-num_rep=3
+num_rep=1
 snr=4
 p=2
-n=300
+n=10000
 x = norm.rvs(size=(p, n), random_state=seed)
 intra_cor=[0,0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
 imp2=np.zeros((4, len(intra_cor), 2))
