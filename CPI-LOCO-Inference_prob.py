@@ -22,7 +22,7 @@ seed=2024
 num_rep=1
 snr=4
 p=2
-n=10000
+n=1000
 x = norm.rvs(size=(p, n), random_state=seed)
 intra_cor=[0,0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
 imp2=np.zeros((4, len(intra_cor), 2))
@@ -109,7 +109,7 @@ for i in range(num_rep):
             imp2[2,i,j]+=1/num_rep*vimp.vimp_*np.var(y)
             pval2[2,i, j]+=1/num_rep*vimp.p_value_
         #LOCO Ahmad
-        res_LOCO=compute_loco(data_enc, y)
+        res_LOCO=compute_loco(data_enc, y, dnn=True)
         imp2[3, i]+=1/num_rep*np.array(res_LOCO["val_imp"], dtype=float)
         pval2[3, i]+=1/num_rep*np.array(res_LOCO["p_value"], dtype=float)
 

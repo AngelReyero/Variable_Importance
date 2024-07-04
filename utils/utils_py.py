@@ -83,21 +83,22 @@ def compute_lazy(X, y):
     return dict_vals
 
 
-def compute_loco(X, y, ntree=100, seed=2021, prob_type="regression", dnn=False):
+def compute_loco(X, y, ntree=100, seed=2021, prob_type="regression", dnn=True):
     y = np.array(y)
     dict_vals = {"val_imp": [], "p_value": []}
-    if prob_type == "classification":
-        clf_rf = RandomForestClassifier(n_estimators=ntree, random_state=seed)
-    if prob_type == "regression":
-        if not dnn:
-            clf_rf = RandomForestRegressor(n_estimators=ntree, random_state=seed)
-        else:
-            clf_rf = DNN_learner_single(
+    if dnn:
+        clf_rf = DNN_learner_single(
                 prob_type=prob_type,
                 do_hyper=True,
                 random_state=2023,
                 verbose=0,
             )
+    else:
+        if prob_type == "classification":
+            clf_rf = RandomForestClassifier(n_estimators=ntree, random_state=seed)
+        else: 
+            clf_rf = RandomForestRegressor(n_estimators=ntree, random_state=seed)
+            
 
     rng = np.random.RandomState(seed)
     train_ind = rng.choice(X.shape[0], int(X.shape[0] * 0.8), replace=False)
@@ -122,18 +123,19 @@ def compute_loco(X, y, ntree=100, seed=2021, prob_type="regression", dnn=False):
     # Retrain model
 
     for col in range(X.shape[1]):
-        if prob_type == "classification":
-            clf_rf2 = RandomForestClassifier(n_estimators=ntree, random_state=seed)
-        if prob_type == "regression":
-            if not dnn:
-                clf_rf2 = RandomForestRegressor(n_estimators=ntree, random_state=seed)
-            else:
-                clf_rf2 = DNN_learner_single(
+        if dnn:
+            clf_rf2 = DNN_learner_single(
                     prob_type=prob_type,
                     do_hyper=True,
                     random_state=2023,
                     verbose=0,
                 )
+        else:
+            if prob_type == "classification":
+                clf_rf2 = RandomForestClassifier(n_estimators=ntree, random_state=seed)
+            else: 
+                clf_rf2 = RandomForestRegressor(n_estimators=ntree, random_state=seed)
+            
         print(f"Processing col: {col+1}")
         X_minus_idx = np.delete(np.copy(X), col, -1)
         clf_rf2.fit(X_minus_idx[train_ind, :], y[train_ind])
