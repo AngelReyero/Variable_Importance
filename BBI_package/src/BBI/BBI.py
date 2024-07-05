@@ -23,6 +23,7 @@ from sklearn.utils.validation import check_is_fitted
 from .compute_importance import (
     joblib_compute_conditional,
     joblib_compute_permutation,
+    joblib_compute_conditional_robust,
 )
 from .Dnn_learner import DNN_learner
 from .utils import convert_predict_proba, create_X_y
@@ -104,6 +105,8 @@ class BlockBasedImportance(BaseEstimator, TransformerMixin):
         prop_out_subLayers=0,
         index_i=None,
         random_state=2023,
+        robust=False,
+        n_cal=1,
         com_imp=True,
     ):
         self.estimator = estimator
@@ -136,6 +139,9 @@ class BlockBasedImportance(BaseEstimator, TransformerMixin):
         self.scaler_x = [None] * max(self.k_fold, 1)
         self.scaler_y = [None] * max(self.k_fold, 1)
         self.com_imp = com_imp
+        self.robust=robust
+        self.n_cal=n_cal
+
 
     def fit(self, X, y=None):
         """Build the provided estimator with the training set (X, y)
@@ -674,72 +680,105 @@ class BlockBasedImportance(BaseEstimator, TransformerMixin):
                         .toarray()
                     )
             if self.com_imp:
-                if not self.conditional:
-                    self.pred_scores[ind_fold], score_cur = list(
-                        zip(
-                            *parallel(
-                                delayed(joblib_compute_permutation)(
-                                    self.list_cols[p_col],
-                                    perm,
-                                    estimator,
-                                    self.type,
-                                    self.X_proc[ind_fold],
-                                    y[ind_fold],
-                                    self.prob_type,
-                                    self.org_pred[ind_fold],
-                                    dict_cont=self.dict_cont,
-                                    dict_nom=self.dict_nom,
-                                    proc_col=p_col,
-                                    index_i=ind_fold + 1,
-                                    group_stacking=self.group_stacking,
-                                    random_state=list_seeds_imp[perm],
+                if not self.robust:
+                    if not self.conditional:
+                        self.pred_scores[ind_fold], score_cur = list(
+                            zip(
+                                *parallel(
+                                    delayed(joblib_compute_permutation)(
+                                        self.list_cols[p_col],
+                                        perm,
+                                        estimator,
+                                        self.type,
+                                        self.X_proc[ind_fold],
+                                        y[ind_fold],
+                                        self.prob_type,
+                                        self.org_pred[ind_fold],
+                                        dict_cont=self.dict_cont,
+                                        dict_nom=self.dict_nom,
+                                        proc_col=p_col,
+                                        index_i=ind_fold + 1,
+                                        group_stacking=self.group_stacking,
+                                        random_state=list_seeds_imp[perm],
+                                    )
+                                    for p_col in range(len(self.list_cols))
+                                    for perm in range(self.n_perm)
                                 )
-                                for p_col in range(len(self.list_cols))
-                                for perm in range(self.n_perm)
                             )
                         )
-                    )
-                    self.pred_scores[ind_fold] = np.array(
-                        self.pred_scores[ind_fold]
-                    ).reshape(
-                        (
-                            len(self.list_cols),
-                            self.n_perm,
-                            y[ind_fold].shape[0],
-                            output_dim,
+                        self.pred_scores[ind_fold] = np.array(
+                            self.pred_scores[ind_fold]
+                        ).reshape(
+                            (
+                                len(self.list_cols),
+                                self.n_perm,
+                                y[ind_fold].shape[0],
+                                output_dim,
+                            )
                         )
-                    )
+                    else:
+                        self.pred_scores[ind_fold], score_cur = list(
+                            zip(
+                                *parallel(
+                                    delayed(joblib_compute_conditional)(
+                                        self.list_cols[p_col],
+                                        self.n_perm,
+                                        estimator,
+                                        self.type,
+                                        self.importance_estimator,
+                                        self.X_proc[ind_fold],
+                                        y[ind_fold],
+                                        self.prob_type,
+                                        self.org_pred[ind_fold],
+                                        seed=self.random_state,
+                                        dict_cont=self.dict_cont,
+                                        dict_nom=self.dict_nom,
+                                        X_nominal=self.X_nominal[ind_fold],
+                                        list_nominal=self.list_nominal,
+                                        encoder=self.dict_enc,
+                                        proc_col=p_col,
+                                        index_i=ind_fold + 1,
+                                        group_stacking=self.group_stacking,
+                                        list_seeds=list_seeds_imp,
+                                        Perm=self.Perm,
+                                        output_dim=output_dim,
+                                    )
+                                    for p_col in range(len(self.list_cols))
+                                )
+                            )
+                        )
                 else:
                     self.pred_scores[ind_fold], score_cur = list(
-                        zip(
-                            *parallel(
-                                delayed(joblib_compute_conditional)(
-                                    self.list_cols[p_col],
-                                    self.n_perm,
-                                    estimator,
-                                    self.type,
-                                    self.importance_estimator,
-                                    self.X_proc[ind_fold],
-                                    y[ind_fold],
-                                    self.prob_type,
-                                    self.org_pred[ind_fold],
-                                    seed=self.random_state,
-                                    dict_cont=self.dict_cont,
-                                    dict_nom=self.dict_nom,
-                                    X_nominal=self.X_nominal[ind_fold],
-                                    list_nominal=self.list_nominal,
-                                    encoder=self.dict_enc,
-                                    proc_col=p_col,
-                                    index_i=ind_fold + 1,
-                                    group_stacking=self.group_stacking,
-                                    list_seeds=list_seeds_imp,
-                                    Perm=self.Perm,
-                                    output_dim=output_dim,
+                            zip(
+                                *parallel(
+                                    delayed(joblib_compute_conditional_robust)(
+                                        self.list_cols[p_col],
+                                        self.n_perm,
+                                        estimator,
+                                        self.type,
+                                        self.importance_estimator,
+                                        self.X_proc[ind_fold],
+                                        y[ind_fold],
+                                        self.prob_type,
+                                        self.org_pred[ind_fold],
+                                        n_cal=self.n_cal,
+                                        seed=self.random_state,
+                                        dict_cont=self.dict_cont,
+                                        dict_nom=self.dict_nom,
+                                        X_nominal=self.X_nominal[ind_fold],
+                                        list_nominal=self.list_nominal,
+                                        encoder=self.dict_enc,
+                                        proc_col=p_col,
+                                        index_i=ind_fold + 1,
+                                        group_stacking=self.group_stacking,
+                                        list_seeds=list_seeds_imp,
+                                        Perm=self.Perm,
+                                        output_dim=output_dim,
+                                    )
+                                    for p_col in range(len(self.list_cols))
                                 )
-                                for p_col in range(len(self.list_cols))
                             )
                         )
-                    )
                 score_imp_l.append(score_cur[0])
                 # Compute the mean over the number of permutations/resampling
                 self.pred_scores[ind_fold] = np.mean(

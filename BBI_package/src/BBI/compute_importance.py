@@ -686,3 +686,281 @@ def hypertune_predictor(estimator, X, y, param_grid):
     grid_search = GridSearchCV(estimator, param_grid=param_grid, cv=2)
     grid_search.fit(X, y)
     return grid_search.best_estimator_
+
+
+def joblib_compute_conditional_robust(
+    p_col,
+    n_sample,
+    estimator,
+    type_predictor,
+    importance_estimator,
+    X_test_list,
+    y_test,
+    prob_type,
+    org_pred,
+    n_cal=1,
+    seed=None,
+    dict_cont={},
+    dict_nom={},
+    X_nominal=None,
+    list_nominal={},
+    encoder={},
+    proc_col=None,
+    index_i=None,
+    group_stacking=False,
+    list_seeds=None,
+    Perm=False,
+    output_dim=1,
+):
+    """This function applies the conditional approach for feature importance.
+    Parameters
+    ----------
+    p_col: list
+        The list of single variables/groups to compute the feature importance.
+    n_sample: int
+        The number of permutations/samples to loop
+    estimator: scikit-learn compatible estimator, default=None
+        The provided estimator for the prediction task (First block)
+    type_predictor: string
+        The provided predictor either the DNN learner or not.
+        The DNN learner will use different inputs for the different
+        sub-models especially while applying the stacking case.
+    importance_estimator: scikit-learn compatible estimator, default=None
+        The provided estimator for the importance task (Second block)
+    X_test_list: list
+        The list of inputs containing either one input or a number of inputs
+        equal to the number of sub-models of the DNN learner.
+    y_test: {array-like, sparse matrix}, shape (n_samples, n_output)
+        The output test samples.
+    prob_type: str, default='regression'
+        A classification or a regression problem.
+    org_pred: {array-like, sparse matrix}, shape (n_output, n_samples)
+        The predictions using the original samples.
+    seed: int, default=None
+        Fixing the seeds of the random generator.
+    dict_cont: dict, default={}
+        The dictionary providing the indices of the continuous variables.
+    dict_nom: dict, default={}
+        The dictionary providing the indices of the categorical variables.
+    X_nominal: {array-like}, default=None
+        The dataframe of categorical variables without encoding.
+    list_nominal: dict, default={}
+        The dictionary of binary, nominal and ordinal variables.
+    encoder: dict, default={}
+        The dictionary of encoders for categorical variables.
+    proc_col: int, default=None
+        The processed column to print if verbose > 0.
+    index_i: int, default=None
+        The index of the current processed iteration.
+    group_stacking: bool, default=False
+        Apply the stacking-based method for the provided groups.
+    list_seeds: list, default=None
+        The list of seeds to fix the RandomState for reproducibility.
+    Perm: bool, default=False
+        The use of permutations or random sampling with CPI-DNN.
+    output_dim:
+
+    """
+    rng = np.random.RandomState(seed)
+
+    res_ar = np.empty((n_sample, y_test.shape[0], output_dim))
+
+    # A list of copied items to avoid any overlapping in the process
+    current_X_test_list = [
+        (lambda x: x.copy()[np.newaxis, ...] if len(x.shape) != 3 else x.copy())(
+            X_test_el
+        )
+        for X_test_el in X_test_list
+    ]
+
+    Res_col = [None] * len(current_X_test_list)
+    X_col_pred = {
+        "regression": [None] * len(current_X_test_list),
+        "classification": None,
+        "ordinal": None,
+    }
+
+    # Group partitioning
+    grp_nom = [
+        item
+        for item in p_col
+        if (item in dict_nom.keys())
+        and (item in list_nominal["nominal"] + list_nominal["binary"])
+    ]
+    grp_ord = [
+        item for item in p_col if (item in dict_nom.keys()) and (item not in grp_nom)
+    ]
+    grp_cont = [item for item in p_col if item not in (grp_nom + grp_ord)]
+
+    # If modified Random Forest is applied
+    pred_mod_RF = {
+        "regression": [None] * len(current_X_test_list),
+        "classification": [None],
+        "ordinal": [None] * len(grp_ord),
+    }
+
+    p_col_n = {"regression": [], "classification": [], "ordinal": []}
+    if not group_stacking:
+        for val in p_col:
+            if val in grp_nom:
+                p_col_n["classification"] += dict_nom[val]
+            if val in grp_cont:
+                p_col_n["regression"] += dict_cont[val]
+            if val in grp_ord:
+                p_col_n["ordinal"] += dict_nom[val]
+    else:
+        p_col_n["regression"] = p_col
+
+    # Dictionary of booleans checking for the encountered type of group
+    var_type = {
+        "regression": False,
+        "classification": False,
+        "ordinal": False,
+    }
+
+    X_col_new = {
+        "regression": None,
+        "classification": None,
+        "ordinal": None,
+    }
+    output = {"regression": None, "classification": None, "ordinal": None}
+    importance_models = {
+        "regression": None,
+        "classification": None,
+        "ordinal": None,
+    }
+
+    if importance_estimator is None:
+        importance_models["regression"] = RandomForestRegressor(
+            random_state=seed, max_depth=5
+        )
+        importance_models["classification"] = RandomForestClassifier(
+            random_state=seed, max_depth=5
+        )
+        importance_models["ordinal"] = RandomForestClassifier(
+            random_state=seed, max_depth=5
+        )
+    elif importance_estimator == "Mod_RF":
+        importance_models["regression"] = RandomForestRegressorModified(
+            random_state=seed,
+            min_samples_leaf=10,
+        )
+        importance_models["classification"] = RandomForestClassifierModified(
+            random_state=seed, min_samples_leaf=10
+        )
+        importance_models["ordinal"] = RandomForestClassifierModified(
+            random_state=seed, min_samples_leaf=10
+        )
+    else:
+        importance_models = importance_estimator.copy()
+
+    # Checking for pure vs hybrid groups
+    if len(grp_cont) > 0:
+        var_type["regression"] = True
+    if len(grp_nom) > 0:
+        var_type["classification"] = True
+    if len(grp_ord) > 0:
+        var_type["ordinal"] = True
+
+    # All the variables of the same group will be removed simultaneously so it can be
+    # predicted conditional on the remaining variables
+    if importance_estimator != "Mod_RF":
+        if var_type["regression"]:
+            for counter_test, X_test_comp in enumerate(current_X_test_list):
+                X_test_minus_idx = np.delete(
+                    np.copy(X_test_comp),
+                    p_col_n["regression"]
+                    + p_col_n["classification"]
+                    + p_col_n["ordinal"],
+                    -1,
+                )
+
+                # Nb of y outputs x Nb of samples x Nb of regression outputs
+                output["regression"] = X_test_comp[..., p_col_n["regression"]]
+                X_col_pred["regression"][counter_test] = []
+                for cur_output_ind in range(X_test_minus_idx.shape[0]):
+                    importance_models["regression"] = hypertune_predictor(
+                        importance_models["regression"],
+                        X_test_minus_idx[cur_output_ind, ...],
+                        output["regression"][cur_output_ind, ...],
+                        param_grid={"max_depth": [2, 5, 10]}
+                    )
+                    importance_models["regression"].fit(
+                        X_test_minus_idx[cur_output_ind, ...],
+                        output["regression"][cur_output_ind, ...],
+                    )
+                    X_col_pred["regression"][counter_test].append(
+                        importance_models["regression"].predict(
+                            X_test_minus_idx[cur_output_ind, ...]
+                        )
+                    )
+
+                X_col_pred["regression"][counter_test] = np.array(
+                    X_col_pred["regression"][counter_test]
+                )
+                X_col_pred["regression"][counter_test] = X_col_pred["regression"][
+                    counter_test
+                ].reshape(output["regression"].shape)
+                Res_col[counter_test] = (
+                    output["regression"] - X_col_pred["regression"][counter_test]
+                )
+
+        # The loop doesn't include the classification part because the input across the different DNN sub-models
+        # is the same without the stacking part (where extra sub-linear layers are used), therefore identical inputs
+        # won't need looping classification process. This is not the case with the regression part.
+        
+        
+    if prob_type in ("classification", "binary"):
+        score = roc_auc_score(y_test, org_pred)
+    else:
+        score = (
+            mean_absolute_error(y_test, org_pred),
+            r2_score(y_test, org_pred),
+        )
+
+
+
+    for sample in range(n_sample):
+        if index_i is not None:
+            print(
+                f"Iteration/Fold:{index_i}, Processing col:{proc_col+1}, Sample:{sample+1}"
+            )
+        else:
+            print(f"Processing col:{proc_col+1}")
+        # Same shuffled indices across the sub-models items
+        first=True
+        indices = np.arange(current_X_test_list[0].shape[1])
+        for k in range(n_cal):
+            if importance_estimator != "Mod_RF":
+                rng = np.random.RandomState(list_seeds[sample])
+                if Perm:
+                    rng.shuffle(indices)
+                else:
+                    indices = rng.choice(indices, size=len(indices))
+
+                for counter_test, X_test_comp in enumerate(current_X_test_list):
+                    if var_type["regression"]:
+                        X_test_comp[..., p_col_n["regression"]] = (
+                            X_col_pred["regression"][counter_test]
+                            + Res_col[counter_test][:, indices, :]
+                        )
+                    
+            if prob_type == "regression":
+                if type_predictor == "DNN":
+                    if first:
+                        pred_i=np.zeros(estimator.predict(current_X_test_list, scale=False).shape)
+                    first=False
+                    pred_i +=1/n_cal*estimator.predict(current_X_test_list, scale=False)
+                else:
+                    if first:
+                        pred_i=np.zeros(estimator.predict(current_X_test_list[0].squeeze()).shape)
+                    first=False
+                    pred_i +=1/n_cal* estimator.predict(current_X_test_list[0].squeeze())
+
+            # Convert to the (n_samples x n_outputs) format
+        if len(pred_i.shape) != 2:
+            pred_i = pred_i.reshape(-1, 1)
+        res_ar[sample, ::] = (y_test - pred_i) ** 2 - (y_test - org_pred) ** 2
+        
+
+    return res_ar, score

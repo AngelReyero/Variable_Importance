@@ -22,16 +22,14 @@ seed=2024
 num_rep=1
 snr=4
 p=2
-n=1000
+n=500
 x = norm.rvs(size=(p, n), random_state=seed)
 intra_cor=[0,0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
-imp2=np.zeros((4, len(intra_cor), 2))
-pval2=np.zeros((4, len(intra_cor), 2))
+imp2=np.zeros((5, len(intra_cor), 2))
+pval2=np.zeros((5, len(intra_cor), 2))
  # Determine beta coefficients
 rng = np.random.RandomState(seed)
 n_signal=2
-#effectset = [-0.5, -1, -2, -3, 0.5, 1, 2, 3]
-#beta = rng.choice(effectset, size=(n_signal), replace=True)
 beta=np.array([2,1])
 for i in range(num_rep):
     print("Experience: "+str(i))
@@ -58,6 +56,28 @@ for i in range(num_rep):
                 )
         y = prod_signal + sigma_noise * rng.normal(size=prod_signal.shape[0]) 
         
+
+        #LOCO robust
+        bbi_model3 = BlockBasedImportance(
+                estimator=None,
+                do_hyper=True,
+                importance_estimator=None,
+                dict_hyper=None,
+                conditional=True,
+                group_stacking=False,
+                n_perm=100,
+                n_jobs=10,
+                prob_type="regression",
+                k_fold=2,
+                robust=True,
+                n_cal=100,
+            )
+        bbi_model3.fit(data_enc, y)
+        res_CPI_Rob = bbi_model3.compute_importance()
+        imp2[4,i]+=1/num_rep*res_CPI_Rob["importance"].reshape((2,))
+        pval2[4,i]+=1/num_rep*res_CPI_Rob["pval"].reshape((2,))
+
+
         #Conditional
         bbi_model = BlockBasedImportance(
                 estimator=None,
@@ -109,16 +129,17 @@ for i in range(num_rep):
             imp2[2,i,j]+=1/num_rep*vimp.vimp_*np.var(y)
             pval2[2,i, j]+=1/num_rep*vimp.p_value_
         #LOCO Ahmad
-        res_LOCO=compute_loco(data_enc, y, dnn=True)
+        res_LOCO=compute_loco(data_enc, y, dnn=False)#TO CHANGE
         imp2[3, i]+=1/num_rep*np.array(res_LOCO["val_imp"], dtype=float)
         pval2[3, i]+=1/num_rep*np.array(res_LOCO["p_value"], dtype=float)
+        
 
 
 #%%
 #Save the results
 f_res={}
 f_res = pd.DataFrame(f_res)
-for i in range(4):#CPI, PFI, LOCO_W, LOCO_AC
+for i in range(5):#CPI, PFI, LOCO_W, LOCO_AC
     for j in range(len(intra_cor)):
         f_res1={}
         if i==0:
@@ -127,8 +148,10 @@ for i in range(4):#CPI, PFI, LOCO_W, LOCO_AC
             f_res1["method"]=["PFI"]
         elif i==2: 
             f_res1["method"]=["LOCO"]
-        else:
+        elif i==3:
             f_res1["method"]=["LOCO-AC"]
+        else:
+            f_res1["method"]=["Robust-CPI"]
         f_res1["intra_cor"]=intra_cor[j]
         for k in range(len(list(data.columns))):
             f_res1["imp_V"+str(k)]=imp2[i, j, k]
