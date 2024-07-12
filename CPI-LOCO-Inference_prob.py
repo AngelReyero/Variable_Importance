@@ -19,7 +19,7 @@ from sklearn.model_selection import GridSearchCV
 seed=2024
 
 #%%
-num_rep=1
+num_rep=5
 snr=4
 p=2
 n=500
