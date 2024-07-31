@@ -19,20 +19,20 @@ from sklearn.model_selection import GridSearchCV
 seed=2024
 
 #%%
-num_rep=5
+num_rep=10
 snr=4
 p=2
 n=500
 x = norm.rvs(size=(p, n), random_state=seed)
 intra_cor=[0,0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
-imp2=np.zeros((5, len(intra_cor), 2))
+imp2=np.zeros((5,num_rep, len(intra_cor), 2))# 5 because there is 5 methods
 pval2=np.zeros((5, len(intra_cor), 2))
  # Determine beta coefficients
 rng = np.random.RandomState(seed)
 n_signal=2
 beta=np.array([2,1])
-for i in range(num_rep):
-    print("Experience: "+str(i))
+for l in range(num_rep):
+    print("Experience: "+str(l))
     for (i,cor) in enumerate(intra_cor):
         print("With correlation="+str(cor))
         #First we construct the sample with the third useless covariate with correlation=cor
@@ -74,7 +74,7 @@ for i in range(num_rep):
             )
         bbi_model3.fit(data_enc, y)
         res_CPI_Rob = bbi_model3.compute_importance()
-        imp2[4,i]+=1/num_rep*res_CPI_Rob["importance"].reshape((2,))
+        imp2[4,l,i]=res_CPI_Rob["importance"].reshape((2,))
         pval2[4,i]+=1/num_rep*res_CPI_Rob["pval"].reshape((2,))
 
 
@@ -93,7 +93,7 @@ for i in range(num_rep):
             )
         bbi_model.fit(data_enc, y)
         res_CPI = bbi_model.compute_importance()
-        imp2[0,i]+=1/(2*num_rep)*res_CPI["importance"].reshape((2,))
+        imp2[0,l,i]=1/2*res_CPI["importance"].reshape((2,))
         pval2[0,i]+=1/(2*num_rep)*res_CPI["pval"].reshape((2,))
         #PFI
         bbi_model2 = BlockBasedImportance(
@@ -110,7 +110,7 @@ for i in range(num_rep):
             )
         bbi_model2.fit(data_enc, y)
         res_PFI = bbi_model2.compute_importance()
-        imp2[1,i]+=1/num_rep*res_PFI["importance"].reshape((2,))
+        imp2[1,l,i]=res_PFI["importance"].reshape((2,))
         pval2[1,i]+=1/num_rep*res_PFI["pval"].reshape((2,))
         #LOCO
         ntrees = np.arange(100, 500, 100)
@@ -126,11 +126,11 @@ for i in range(num_rep):
             vimp.get_se()
             vimp.get_ci()
             vimp.hypothesis_test(alpha = 0.05, delta = 0)
-            imp2[2,i,j]+=1/num_rep*vimp.vimp_*np.var(y)
+            imp2[2,l,i,j]+=vimp.vimp_*np.var(y)
             pval2[2,i, j]+=1/num_rep*vimp.p_value_
         #LOCO Ahmad
         res_LOCO=compute_loco(data_enc, y, dnn=False)#TO CHANGE
-        imp2[3, i]+=1/num_rep*np.array(res_LOCO["val_imp"], dtype=float)
+        imp2[3, l,i]=np.array(res_LOCO["val_imp"], dtype=float)
         pval2[3, i]+=1/num_rep*np.array(res_LOCO["p_value"], dtype=float)
         
 
@@ -139,7 +139,7 @@ for i in range(num_rep):
 #Save the results
 f_res={}
 f_res = pd.DataFrame(f_res)
-for i in range(5):#CPI, PFI, LOCO_W, LOCO_AC
+for i in range(5):#CPI, PFI, LOCO_W, LOCO_AC, Robust-Loco
     for j in range(len(intra_cor)):
         f_res1={}
         if i==0:
@@ -154,7 +154,8 @@ for i in range(5):#CPI, PFI, LOCO_W, LOCO_AC
             f_res1["method"]=["Robust-CPI"]
         f_res1["intra_cor"]=intra_cor[j]
         for k in range(len(list(data.columns))):
-            f_res1["imp_V"+str(k)]=imp2[i, j, k]
+            f_res1["imp_V"+str(k)]=np.mean(imp2[i,:, j, k])
+            f_res1["var"+str(k)]=np.std(imp2[i,:, j, k])
             f_res1["pval_V"+str(k)]=pval2[i, j, k]
         f_res1=pd.DataFrame(f_res1)
         f_res=pd.concat([f_res, f_res1], ignore_index=True)
@@ -163,6 +164,18 @@ f_res.to_csv(
     index=False,
 ) 
 
+#%%
+def numerize_method(method):
+    if method=="0.5*CPI": 
+        return 0
+    elif method=="PFI":
+        return 1
+    elif method=="LOCO":
+        return 2
+    elif method=="LOCO-AC":
+        return 3
+    else:
+        return 4
 
 #%%
 
@@ -173,14 +186,18 @@ list(res_path.glob('*.csv'))
 
 df = pd.read_csv(res_path/"simulation_CPI-LOCO-Bias-diff_corr.csv")
 
+colors = ['blue', 'green', 'red', 'purple', 'orange']
+
 p=2# Number of covariates
 fig, axs = plt.subplots(2,p)
 fig.suptitle("Different correlations with CPI vs PFI vs LOCO",fontsize=16)
 for i in range(p):
     for method, group in df.groupby('method'):
-        axs[0, i].plot(group['intra_cor'], group['imp_V'+str(i)], label=method)
+        t=numerize_method(method)
+        axs[0, i].plot(group['intra_cor'], group['imp_V'+str(i)], label=method, color=colors[t])
+        axs[0,i].errorbar(group["intra_cor"], group['imp_V'+str(i)], yerr=group['var'+str(i)], fmt='o', capsize=5, linestyle='None', color=colors[t])
         axs[1, i].plot(group['intra_cor'], -np.log10(group['pval_V'+str(i)]+1e-10), label=method)
-    axs[0, i].plot(np.linspace(0,0.9, 50), beta[i]**2*(1-np.linspace(0,0.9, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1)
+    axs[0, i].plot(np.linspace(0,0.9, 50), beta[i]**2*(1-np.linspace(0,0.9, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color=colors[t])
     axs[0, i].set_title(r'Importance $x$'+str(i), fontsize=14)
     axs[1,i].axhline(y=-np.log10(0.05), color='r', linestyle='--', linewidth=1)
     axs[1, i].set_title(r'-log10(p_value) $x$'+str(i), fontsize=14)
