@@ -19,10 +19,10 @@ from sklearn.model_selection import GridSearchCV
 seed=2024
 
 #%%
-num_rep=10
+num_rep=3
 snr=4
 p=2
-n=500
+n=300
 x = norm.rvs(size=(p, n), random_state=seed)
 intra_cor=[0,0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
 imp2=np.zeros((5,num_rep, len(intra_cor), 2))# 5 because there is 5 methods
@@ -129,7 +129,7 @@ for l in range(num_rep):
             imp2[2,l,i,j]+=vimp.vimp_*np.var(y)
             pval2[2,i, j]+=1/num_rep*vimp.p_value_
         #LOCO Ahmad
-        res_LOCO=compute_loco(data_enc, y, dnn=False)#TO CHANGE
+        res_LOCO=compute_loco(data_enc, y, dnn=True)#TO CHANGE (dnn=True for the correct LOCO)
         imp2[3, l,i]=np.array(res_LOCO["val_imp"], dtype=float)
         pval2[3, i]+=1/num_rep*np.array(res_LOCO["p_value"], dtype=float)
         
@@ -210,4 +210,59 @@ fig.text(0.53, 0, r'$\rho$', ha='center', va='center')
 fig.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-corr.pdf", bbox_inches="tight")
 
 
-# %%
+
+
+#%% Lineplot
+#Save the results
+f_res={}
+f_res = pd.DataFrame(f_res)
+for l in range(num_rep):
+    for i in range(5):#CPI, PFI, LOCO_W, LOCO_AC, Robust-Loco
+        for j in range(len(intra_cor)):
+            f_res1={}
+            if i==0:
+                f_res1["method"] = ["0.5*CPI"]
+            elif i==1:
+                f_res1["method"]=["PFI"]
+            elif i==2: 
+                f_res1["method"]=["LOCO"]
+            elif i==3:
+                f_res1["method"]=["LOCO-AC"]
+            else:
+                f_res1["method"]=["Robust-CPI"]
+            f_res1["intra_cor"]=intra_cor[j]
+            for k in range(len(list(data.columns))):
+                f_res1["imp_V"+str(k)]=imp2[i,l, j, k]
+                f_res1["pval_V"+str(k)]=pval2[i, j, k]
+            f_res1=pd.DataFrame(f_res1)
+            f_res=pd.concat([f_res, f_res1], ignore_index=True)
+f_res.to_csv(
+    f"results/results_csv_Angel/simulation_CPI-LOCO-Bias-diff_corr_lineplt.csv",
+    index=False,
+) 
+
+#%%
+
+#palette = {'LDA-MCAR': 'blue', '0-imp+LDA': 'blue', 'ICE-imp+LDA':'blue', 'pbp LDA':'blue', '0-imp+Perceptron':'orange', 'ICE-imp+Perceptron':'orange', 'pbp Perceptron': 'orange', '0-imp+LogReg': 'green', 'ICE-imp+LogReg':'green', 'pbp LogReg': 'green'}
+#markers = {'LDA-MCAR': 's', '0-imp+LDA': 'o', 'ICE-imp+LDA':'^', 'pbp LDA':'D', '0-imp+Perceptron':'o', 'ICE-imp+Perceptron':'^', 'pbp Perceptron': 'D', '0-imp+LogReg': 'o', 'ICE-imp+LogReg':'^', 'pbp LogReg': 'D'}
+#dashes = {'LDA-MCAR': (), '0-imp+LDA':(5, 5) , 'ICE-imp+LDA':(3, 5, 1, 5), 'pbp LDA':(1, 1), '0-imp+Perceptron':(5, 5), 'ICE-imp+Perceptron':(3, 5, 1, 5), 'pbp Perceptron': (1, 1), '0-imp+LogReg': (5, 5), 'ICE-imp+LogReg':(3, 5, 1, 5), 'pbp LogReg':(1, 1) }# (): cont (1,1) dotted (5,5) dashed (3,5,1,5) dashdot
+
+sns.set(rc={'figure.figsize':(4,4)})
+sns.lineplot(data=f_res,x='intra_cor',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+plt.plot(np.linspace(0,0.9, 50), beta[i]**2*(1-np.linspace(0,0.9, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color=colors[t])
+
+#plt.ylim((1e-2,1e3))
+#plt.legend()
+
+plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+
+plt.subplots_adjust(right=0.75)
+
+#plt.xscale('log')
+#plt.yscale('log')
+
+
+plt.ylabel('Importance')
+plt.xlabel(r'Correlation')
+fig.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-corr-lineplt0.pdf", bbox_inches="tight")
+plt.show()
