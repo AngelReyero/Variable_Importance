@@ -16,13 +16,14 @@ import vimpy
 from utils.utils_py import compute_loco
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import GridSearchCV
+import seaborn as sns
 seed=2024
 
 #%%
 num_rep=3
 snr=4
 p=2
-n=300
+n=100
 x = norm.rvs(size=(p, n), random_state=seed)
 intra_cor=[0,0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
 imp2=np.zeros((5,num_rep, len(intra_cor), 2))# 5 because there is 5 methods
@@ -58,6 +59,7 @@ for l in range(num_rep):
         
 
         #LOCO robust
+        n_cal=100
         bbi_model3 = BlockBasedImportance(
                 estimator=None,
                 do_hyper=True,
@@ -70,11 +72,11 @@ for l in range(num_rep):
                 prob_type="regression",
                 k_fold=2,
                 robust=True,
-                n_cal=100,
+                n_cal=n_cal,
             )
         bbi_model3.fit(data_enc, y)
         res_CPI_Rob = bbi_model3.compute_importance()
-        imp2[4,l,i]=res_CPI_Rob["importance"].reshape((2,))
+        imp2[4,l,i]=res_CPI_Rob["importance"].reshape((2,))*n_cal/(n_cal+1)
         pval2[4,i]+=1/num_rep*res_CPI_Rob["pval"].reshape((2,))
 
 
@@ -240,6 +242,7 @@ f_res.to_csv(
     f"results/results_csv_Angel/simulation_CPI-LOCO-Bias-diff_corr_lineplt.csv",
     index=False,
 ) 
+print(f_res.head())
 
 #%%
 
@@ -247,9 +250,16 @@ f_res.to_csv(
 #markers = {'LDA-MCAR': 's', '0-imp+LDA': 'o', 'ICE-imp+LDA':'^', 'pbp LDA':'D', '0-imp+Perceptron':'o', 'ICE-imp+Perceptron':'^', 'pbp Perceptron': 'D', '0-imp+LogReg': 'o', 'ICE-imp+LogReg':'^', 'pbp LogReg': 'D'}
 #dashes = {'LDA-MCAR': (), '0-imp+LDA':(5, 5) , 'ICE-imp+LDA':(3, 5, 1, 5), 'pbp LDA':(1, 1), '0-imp+Perceptron':(5, 5), 'ICE-imp+Perceptron':(3, 5, 1, 5), 'pbp Perceptron': (1, 1), '0-imp+LogReg': (5, 5), 'ICE-imp+LogReg':(3, 5, 1, 5), 'pbp LogReg':(1, 1) }# (): cont (1,1) dotted (5,5) dashed (3,5,1,5) dashdot
 
+
+df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-Bias-diff_corr_lineplt.csv")
+
+# Display the first few rows of the DataFrame
+print(df.head())
+
+
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=f_res,x='intra_cor',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(np.linspace(0,0.9, 50), beta[i]**2*(1-np.linspace(0,0.9, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color=colors[t])
+plt.plot(np.linspace(0,0.9, 50), beta[0]**2*(1-np.linspace(0,0.9, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -264,5 +274,34 @@ plt.subplots_adjust(right=0.75)
 
 plt.ylabel('Importance')
 plt.xlabel(r'Correlation')
-fig.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-corr-lineplt0.pdf", bbox_inches="tight")
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-corr-lineplt0.pdf", bbox_inches="tight")
+plt.show()
+
+
+#%%
+
+df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-Bias-diff_corr_lineplt.csv")
+
+# Display the first few rows of the DataFrame
+print(df.head())
+
+
+sns.set(rc={'figure.figsize':(4,4)})
+sns.lineplot(data=f_res,x='intra_cor',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+plt.plot(np.linspace(0,0.9, 50), beta[1]**2*(1-np.linspace(0,0.9, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
+
+#plt.ylim((1e-2,1e3))
+#plt.legend()
+
+plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+
+plt.subplots_adjust(right=0.75)
+
+#plt.xscale('log')
+#plt.yscale('log')
+
+
+plt.ylabel('Importance')
+plt.xlabel(r'Correlation')
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-corr-lineplt0.pdf", bbox_inches="tight")
 plt.show()
