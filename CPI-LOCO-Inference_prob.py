@@ -655,7 +655,8 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(n_samples, asymp[0,0], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+asymp=asymp[asymp["coord"]==0]
+plt.plot(n_samples, asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -685,7 +686,8 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(n_samples, asymp[1,0], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+asymp=asymp[asymp["coord"]==1]
+plt.plot(n_samples, asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -715,7 +717,8 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V5',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(n_samples, asymp[2,0], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+asymp=asymp[asymp["coord"]==5]
+plt.plot(n_samples, asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -745,7 +748,8 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V6',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(n_samples, asymp[3,0], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+asymp=asymp[asymp["coord"]==6]
+plt.plot(n_samples, asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -821,7 +825,7 @@ asymp_df.to_csv(
 for l in range(num_rep):
     print("Experiment: "+str(l))
     for (i,cor) in enumerate(intra_cor):
-        print("With n="+str(n))
+        print("With cor="+str(cor))
         X,y=GenToysDataset(n=n, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
 
         
@@ -940,7 +944,8 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='cor',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(intra_cor, asymp[:,0,0], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+asymp=asymp[asymp["coord"]==0]
+plt.plot(asymp["intra_co"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -970,7 +975,8 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='cor',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(intra_cor, asymp[:,1,0], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+asymp=asymp[asymp["coord"]==1]
+plt.plot(asymp["intra_co"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -999,8 +1005,9 @@ print(df.head())
 
 
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='cor',y='imp_V6',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(intra_cor, asymp[:,2,0], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+sns.lineplot(data=df,x='cor',y='imp_V5',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+asymp=asymp[asymp["coord"]==5]
+plt.plot(asymp["intra_co"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1030,7 +1037,8 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='cor',y='imp_V6',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(intra_cor, asymp[:,3,0], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+asymp=asymp[asymp["coord"]==6]
+plt.plot(asymp["intra_co"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1047,6 +1055,300 @@ plt.ylabel(r'Importance of $X_6$')
 plt.xlabel(r'Correlation')
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt6.pdf", bbox_inches="tight")
 plt.show()
+
+
+
+
+#Fifth EXPERIMENT: 
+#DATA
+num_rep=3
+snr=4
+dim=[10, 20, 35, 50, 100]
+n=300
+cor=0.6
+imp2=np.zeros((4,num_rep, len(dim), 2))# 4 because there is 4 methods
+pval2=np.zeros((4, len(dim), 2))
+ # Determine beta coefficients
+rng = np.random.RandomState(seed)
+n_cal=100
+
+interest_coord=[0, 1, 6, 7]
+
+#LOCO asymptotically 
+ntrees = np.arange(100, 500, 100)
+lr = np.arange(.01, .1, .05)
+param_grid = [{'n_estimators':ntrees, 'learning_rate':lr}]
+## set up cv objects
+cv_full = GridSearchCV(GradientBoostingRegressor(loss = 'squared_error', max_depth = 1), param_grid = param_grid, cv = 5, n_jobs=-1)
+asymp_df={}
+asymp_df=pd.DataFrame(asymp_df)
+for i_p in range(len(dim)):
+    for j in range(len(interest_coord)):
+        print("covariate: "+str(interest_coord[j]))
+        X,y=GenToysDataset(n=100000, d=dim[i_p], cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
+        asymp1={}
+        vimp = vimpy.vim(y = y, x = X, s = j, pred_func = cv_full, measure_type = "r_squared")
+        vimp.get_point_est()
+        vimp.get_influence_function()
+        vimp.get_se()
+        vimp.get_ci()
+        vimp.hypothesis_test(alpha = 0.05, delta = 0)
+        asymp1["LOCO"]=vimp.vimp_*np.var(y)
+        asymp1["p_value"]=vimp.p_value_
+        asymp1["coord"]=interest_coord[j]
+        asymp1["d"]=dim[i_p]
+        asymp1=pd.DataFrame(asymp1)
+        asymp_df=pd.concat([asymp_df, asymp1], ignore_index=True)
+
+
+asymp_df.to_csv(
+    f"results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d.csv",
+    index=False,
+) 
+
+
+#%%
+for l in range(num_rep):
+    print("Experiment: "+str(l))
+    for (i,p) in enumerate(dim):
+        print("With d="+str(p))
+        X,y=GenToysDataset(n=n, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
+
+        
+
+        #LOCO robust
+        
+        bbi_model3 = BlockBasedImportance(
+                estimator=None,
+                do_hyper=True,
+                importance_estimator=None,
+                dict_hyper=None,
+                conditional=True,
+                group_stacking=False,
+                n_perm=100,
+                n_jobs=10,
+                prob_type="regression",
+                k_fold=2,
+                robust=True,
+                n_cal=n_cal,
+            )
+        bbi_model3.fit(X, y)
+        res_CPI_Rob = bbi_model3.compute_importance()
+        imp2[3,l,i]=res_CPI_Rob["importance"].reshape((2,))*n_cal/(n_cal+1)
+        pval2[3,i]+=1/num_rep*res_CPI_Rob["pval"].reshape((2,))
+
+
+        #Conditional
+        bbi_model = BlockBasedImportance(
+                estimator=None,
+                do_hyper=True,
+                importance_estimator=None,
+                dict_hyper=None,
+                conditional=True,
+                group_stacking=False,
+                n_perm=100,
+                n_jobs=10,
+                prob_type="regression",
+                k_fold=2,
+            )
+        bbi_model.fit(X, y)
+        res_CPI = bbi_model.compute_importance()
+        imp2[0,l,i]=1/2*res_CPI["importance"].reshape((2,))
+        pval2[0,i]+=1/(2*num_rep)*res_CPI["pval"].reshape((2,))
+        #PFI
+        bbi_model2 = BlockBasedImportance(
+                estimator=None,
+                do_hyper=True,
+                importance_estimator="Mod_RF",
+                dict_hyper=None,
+                conditional=False,
+                group_stacking=False,
+                n_perm=100,
+                n_jobs=10,
+                prob_type="regression",
+                k_fold=2,
+            )
+        bbi_model2.fit(X, y)
+        res_PFI = bbi_model2.compute_importance()
+        imp2[1,l,i]=res_PFI["importance"].reshape((2,))
+        pval2[1,i]+=1/num_rep*res_PFI["pval"].reshape((2,))
+        #LOCO
+        ntrees = np.arange(100, 500, 100)
+        lr = np.arange(.01, .1, .05)
+        param_grid = [{'n_estimators':ntrees, 'learning_rate':lr}]
+        ## set up cv objects
+        cv_full = GridSearchCV(GradientBoostingRegressor(loss = 'squared_error', max_depth = 1), param_grid = param_grid, cv = 5, n_jobs=10)
+        for j in range(p):
+            print("covariate: "+str(j))
+            vimp = vimpy.vim(y = y, x = X, s = j, pred_func = cv_full, measure_type = "r_squared")
+            vimp.get_point_est()
+            vimp.get_influence_function()
+            vimp.get_se()
+            vimp.get_ci()
+            vimp.hypothesis_test(alpha = 0.05, delta = 0)
+            imp2[2,l,i,j]+=vimp.vimp_*np.var(y)
+            pval2[2,i, j]+=1/num_rep*vimp.p_value_
+
+        
+
+
+#%% Lineplot
+#Save the results
+f_res={}
+f_res = pd.DataFrame(f_res)
+for l in range(num_rep):
+    for i in range(4):#CPI, PFI, LOCO_W, Robust-Loco
+        for j in range(len(dim)):
+            f_res1={}
+            if i==0:
+                f_res1["method"] = ["0.5*CPI"]
+            elif i==1:
+                f_res1["method"]=["PFI"]
+            elif i==2: 
+                f_res1["method"]=["LOCO"]
+            else:
+                f_res1["method"]=["Robust-CPI"]
+            f_res1["d"]=dim[j]
+            for k in range(len(list(data.columns))):
+                f_res1["imp_V"+str(k)]=imp2[i,l, j, k]
+                f_res1["pval_V"+str(k)]=pval2[i, j, k]
+            f_res1=pd.DataFrame(f_res1)
+            f_res=pd.concat([f_res, f_res1], ignore_index=True)
+f_res.to_csv(
+    f"results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_d_lineplt.csv",
+    index=False,
+) 
+print(f_res.head())
+
+#%%
+
+df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_d_lineplt.csv")
+asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d.csv")
+# Display the first few rows of the DataFrame
+print(df.head())
+
+
+sns.set(rc={'figure.figsize':(4,4)})
+sns.lineplot(data=df,x='d',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+asymp=asymp[asymp["coord"]==0]
+plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+
+#plt.ylim((1e-2,1e3))
+#plt.legend()
+
+plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+
+plt.subplots_adjust(right=0.75)
+
+#plt.xscale('log')
+#plt.yscale('log')
+
+
+plt.ylabel(r'Importance of $X_0$')
+plt.xlabel(r'Dimension')
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-diff-d-lineplt0.pdf", bbox_inches="tight")
+plt.show()
+
+
+#%%
+
+df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_d_lineplt.csv")
+asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d.csv")
+
+# Display the first few rows of the DataFrame
+print(df.head())
+
+
+sns.set(rc={'figure.figsize':(4,4)})
+sns.lineplot(data=df,x='cor',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+asymp=asymp[asymp["coord"]==1]
+plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+
+#plt.ylim((1e-2,1e3))
+#plt.legend()
+
+#plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend().remove()
+plt.subplots_adjust(right=0.75)
+
+#plt.xscale('log')
+#plt.yscale('log')
+
+
+plt.ylabel(r'Importance of $X_1$')
+plt.xlabel(r'Dimension')
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-d-lineplt1.pdf", bbox_inches="tight")
+plt.show()
+
+
+#%%
+
+df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_d_lineplt.csv")
+asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d.csv")
+
+# Display the first few rows of the DataFrame
+print(df.head())
+
+
+sns.set(rc={'figure.figsize':(4,4)})
+sns.lineplot(data=df,x='cor',y='imp_V5',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+asymp=asymp[asymp["coord"]==5]
+plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+
+#plt.ylim((1e-2,1e3))
+#plt.legend()
+
+#plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend().remove()
+plt.subplots_adjust(right=0.75)
+
+#plt.xscale('log')
+#plt.yscale('log')
+
+
+plt.ylabel(r'Importance of $X_5$')
+plt.xlabel(r'Dimension')
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-d-lineplt5.pdf", bbox_inches="tight")
+plt.show()
+
+
+#%%
+
+df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_d_lineplt.csv")
+asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d.csv")
+
+# Display the first few rows of the DataFrame
+print(df.head())
+
+
+sns.set(rc={'figure.figsize':(4,4)})
+sns.lineplot(data=df,x='cor',y='imp_V6',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+asymp=asymp[asymp["coord"]==6]
+plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+
+#plt.ylim((1e-2,1e3))
+#plt.legend()
+
+#plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend().remove()
+plt.subplots_adjust(right=0.75)
+
+#plt.xscale('log')
+#plt.yscale('log')
+
+
+plt.ylabel(r'Importance of $X_6$')
+plt.xlabel(r'Dimension')
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-d-lineplt6.pdf", bbox_inches="tight")
+plt.show()
+
+
+
+
+
+
+
+
 
 
 
