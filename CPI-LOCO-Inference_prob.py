@@ -28,7 +28,7 @@ snr=4
 p=2
 n=100
 x = norm.rvs(size=(p, n), random_state=seed)
-intra_cor=[0,0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.65, 0.8, 0.9]
+intra_cor=[0,0.05, 0.1, 0.2, 0.3, 0.5, 0.65, 0.85]
 imp2=np.zeros((5,num_rep, len(intra_cor), 2))# 5 because there is 5 methods
 pval2=np.zeros((5, len(intra_cor), 2))
  # Determine beta coefficients
