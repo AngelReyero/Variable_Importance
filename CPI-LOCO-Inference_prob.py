@@ -237,11 +237,11 @@ plt.show()
 
 #SECOND EXPERIMENT: 
 #DATA
-num_rep=3
+num_rep=2
 snr=4
 p=2
 cor=0.6
-n_samples=[30, 50, 100, 200, 300, 700]
+n_samples=[30, 50]#[30, 50, 100, 200, 300, 700]
 imp2=np.zeros((5,num_rep, len(n_samples), 2))# 5 because there is 5 methods
 pval2=np.zeros((5, len(n_samples), 2))
  # Determine beta coefficients
