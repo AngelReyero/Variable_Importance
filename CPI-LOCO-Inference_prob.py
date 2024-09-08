@@ -237,11 +237,11 @@ plt.show()
 
 #SECOND EXPERIMENT: 
 #DATA
-num_rep=2
+num_rep=3
 snr=4
 p=2
 cor=0.6
-n_samples=[30, 50]#[30, 50, 100, 200, 300, 700]
+n_samples=[30, 50, 100, 200, 300, 700]
 imp2=np.zeros((5,num_rep, len(n_samples), 2))# 5 because there is 5 methods
 pval2=np.zeros((5, len(n_samples), 2))
  # Determine beta coefficients
@@ -395,7 +395,7 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(n_samples, beta[0]**2*(1-cor**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
+plt.plot(n_samples, [beta[0]**2*(1-cor**2) for i in range(len(n_samples))], label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -424,7 +424,7 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(n_samples, beta[0]**2*(1-cor**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
+plt.plot(n_samples, [beta[0]**2*(1-cor**2) for i in range(len(n_samples))], label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -491,17 +491,19 @@ def GenToysDataset(n=1000, d=10, cor='toep', y_method="imp1", k=2, mu=None, rho_
 #DATA
 num_rep=3
 snr=4
-p=100
+p=50
 cor=0.6
 n_samples=[30, 50, 100, 200, 300, 700]
-imp2=np.zeros((4,num_rep, len(n_samples), 2))# 4 because there is 4 methods
-pval2=np.zeros((4, len(n_samples), 2))
+imp2=np.zeros((4,num_rep, len(n_samples), p))# 4 because there is 4 methods
+pval2=np.zeros((4, len(n_samples), p))
  # Determine beta coefficients
 rng = np.random.RandomState(seed)
 n_cal=100
 
 interest_coord=[0, 1, 6, 7]
-X,y=GenToysDataset(n=100000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
+#%%
+X,y=GenToysDataset(n=10000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
+
 #LOCO asymptotically 
 ntrees = np.arange(100, 500, 100)
 lr = np.arange(.01, .1, .05)
@@ -522,7 +524,7 @@ for j in range(len(interest_coord)):
     asymp1["LOCO"]=vimp.vimp_*np.var(y)
     asymp1["p_value"]=vimp.p_value_
     asymp1["coord"]=interest_coord[j]
-    asymp1=pd.DataFrame(asymp1)
+    asymp1=pd.DataFrame([asymp1])
     asymp_df=pd.concat([asymp_df, asymp1], ignore_index=True)
 
 
@@ -559,8 +561,8 @@ for l in range(num_rep):
             )
         bbi_model3.fit(X, y)
         res_CPI_Rob = bbi_model3.compute_importance()
-        imp2[3,l,i]=res_CPI_Rob["importance"].reshape((2,))*n_cal/(n_cal+1)
-        pval2[3,i]+=1/num_rep*res_CPI_Rob["pval"].reshape((2,))
+        imp2[3,l,i]=res_CPI_Rob["importance"].reshape((p,))*n_cal/(n_cal+1)
+        pval2[3,i]+=1/num_rep*res_CPI_Rob["pval"].reshape((p,))
 
 
         #Conditional
@@ -578,8 +580,8 @@ for l in range(num_rep):
             )
         bbi_model.fit(X, y)
         res_CPI = bbi_model.compute_importance()
-        imp2[0,l,i]=1/2*res_CPI["importance"].reshape((2,))
-        pval2[0,i]+=1/(2*num_rep)*res_CPI["pval"].reshape((2,))
+        imp2[0,l,i]=1/2*res_CPI["importance"].reshape((p,))
+        pval2[0,i]+=1/(2*num_rep)*res_CPI["pval"].reshape((p,))
         #PFI
         bbi_model2 = BlockBasedImportance(
                 estimator=None,
@@ -595,8 +597,8 @@ for l in range(num_rep):
             )
         bbi_model2.fit(X, y)
         res_PFI = bbi_model2.compute_importance()
-        imp2[1,l,i]=res_PFI["importance"].reshape((2,))
-        pval2[1,i]+=1/num_rep*res_PFI["pval"].reshape((2,))
+        imp2[1,l,i]=res_PFI["importance"].reshape((p,))
+        pval2[1,i]+=1/num_rep*res_PFI["pval"].reshape((p,))
         #LOCO
         ntrees = np.arange(100, 500, 100)
         lr = np.arange(.01, .1, .05)
@@ -634,7 +636,7 @@ for l in range(num_rep):
             else:
                 f_res1["method"]=["Robust-CPI"]
             f_res1["n_samples"]=n_samples[j]
-            for k in range(len(list(data.columns))):
+            for k in range(p):
                 f_res1["imp_V"+str(k)]=imp2[i,l, j, k]
                 f_res1["pval_V"+str(k)]=pval2[i, j, k]
             f_res1=pd.DataFrame(f_res1)
@@ -656,7 +658,7 @@ print(df.head())
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==0]
-plt.plot(n_samples, asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -687,7 +689,7 @@ print(df.head())
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==1]
-plt.plot(n_samples, asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -718,7 +720,7 @@ print(df.head())
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V5',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==5]
-plt.plot(n_samples, asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -749,7 +751,7 @@ print(df.head())
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V6',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==6]
-plt.plot(n_samples, asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -772,22 +774,22 @@ plt.show()
 
 
 
-
+#%%
 #Fourth EXPERIMENT: 
 #DATA
-num_rep=3
+num_rep=2#3
 snr=4
-p=50
-n=300
-intra_cor=[0.05, 0.1, 0.3, 0.5, 0.8]
-imp2=np.zeros((4,num_rep, len(intra_cor), 2))# 4 because there is 4 methods
-pval2=np.zeros((4, len(intra_cor), 2))
+p=10#50
+n=50#300
+intra_cor=[0.1, 0.3]#[0.05, 0.1, 0.3, 0.5, 0.8]
+imp2=np.zeros((4,num_rep, len(intra_cor), p))# 4 because there is 4 methods
+pval2=np.zeros((4, len(intra_cor), p))
  # Determine beta coefficients
 rng = np.random.RandomState(seed)
 n_cal=100
 
 interest_coord=[0, 1, 6, 7]
-
+#%%
 #LOCO asymptotically 
 ntrees = np.arange(100, 500, 100)
 lr = np.arange(.01, .1, .05)
@@ -799,7 +801,7 @@ asymp_df=pd.DataFrame(asymp_df)
 for i_cor in range(len(intra_cor)):
     for j in range(len(interest_coord)):
         print("covariate: "+str(interest_coord[j]))
-        X,y=GenToysDataset(n=100000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=intra_cor[i_cor])
+        X,y=GenToysDataset(n=10000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=intra_cor[i_cor])
         asymp1={}
         vimp = vimpy.vim(y = y, x = X, s = j, pred_func = cv_full, measure_type = "r_squared")
         vimp.get_point_est()
@@ -811,7 +813,7 @@ for i_cor in range(len(intra_cor)):
         asymp1["p_value"]=vimp.p_value_
         asymp1["coord"]=interest_coord[j]
         asymp1["intra_cor"]=intra_cor[i_cor]
-        asymp1=pd.DataFrame(asymp1)
+        asymp1=pd.DataFrame([asymp1])
         asymp_df=pd.concat([asymp_df, asymp1], ignore_index=True)
 
 
@@ -848,8 +850,8 @@ for l in range(num_rep):
             )
         bbi_model3.fit(X, y)
         res_CPI_Rob = bbi_model3.compute_importance()
-        imp2[3,l,i]=res_CPI_Rob["importance"].reshape((2,))*n_cal/(n_cal+1)
-        pval2[3,i]+=1/num_rep*res_CPI_Rob["pval"].reshape((2,))
+        imp2[3,l,i]=res_CPI_Rob["importance"].reshape((p,))*n_cal/(n_cal+1)
+        pval2[3,i]+=1/num_rep*res_CPI_Rob["pval"].reshape((p,))
 
 
         #Conditional
@@ -867,8 +869,8 @@ for l in range(num_rep):
             )
         bbi_model.fit(X, y)
         res_CPI = bbi_model.compute_importance()
-        imp2[0,l,i]=1/2*res_CPI["importance"].reshape((2,))
-        pval2[0,i]+=1/(2*num_rep)*res_CPI["pval"].reshape((2,))
+        imp2[0,l,i]=1/2*res_CPI["importance"].reshape((p,))
+        pval2[0,i]+=1/(2*num_rep)*res_CPI["pval"].reshape((p,))
         #PFI
         bbi_model2 = BlockBasedImportance(
                 estimator=None,
@@ -884,8 +886,8 @@ for l in range(num_rep):
             )
         bbi_model2.fit(X, y)
         res_PFI = bbi_model2.compute_importance()
-        imp2[1,l,i]=res_PFI["importance"].reshape((2,))
-        pval2[1,i]+=1/num_rep*res_PFI["pval"].reshape((2,))
+        imp2[1,l,i]=res_PFI["importance"].reshape((p,))
+        pval2[1,i]+=1/num_rep*res_PFI["pval"].reshape((p,))
         #LOCO
         ntrees = np.arange(100, 500, 100)
         lr = np.arange(.01, .1, .05)
@@ -1061,10 +1063,10 @@ plt.show()
 
 #Fifth EXPERIMENT: 
 #DATA
-num_rep=3
+num_rep=2#3
 snr=4
-dim=[10, 20, 35, 50, 100]
-n=300
+dim=[10, 20]#[10, 20, 35, 50, 100]
+n=50#300
 cor=0.6
 imp2=np.zeros((4,num_rep, len(dim), 2))# 4 because there is 4 methods
 pval2=np.zeros((4, len(dim), 2))
