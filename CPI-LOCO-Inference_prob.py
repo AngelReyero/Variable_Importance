@@ -181,9 +181,10 @@ df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-Bias-diff_corr_l
 # Display the first few rows of the DataFrame
 print(df.head())
 
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='intra_cor',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='intra_cor',y='imp_V0',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 plt.plot(np.linspace(0,0.85, 50), beta[0]**2*(1-np.linspace(0,0.85, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
@@ -210,9 +211,10 @@ df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-Bias-diff_corr_l
 # Display the first few rows of the DataFrame
 print(df.head())
 
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='intra_cor',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='intra_cor',y='imp_V1',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 plt.plot(np.linspace(0,0.85, 50), beta[1]**2*(1-np.linspace(0,0.85, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
@@ -392,9 +394,10 @@ df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-Bias-diff_n_line
 # Display the first few rows of the DataFrame
 print(df.head())
 
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='n_samples',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='n_samples',y='imp_V0',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 plt.plot(n_samples, [beta[0]**2*(1-cor**2) for i in range(len(n_samples))], label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
@@ -421,9 +424,10 @@ df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-Bias-diff_n_line
 # Display the first few rows of the DataFrame
 print(df.head())
 
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='n_samples',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='n_samples',y='imp_V1',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 plt.plot(n_samples, [beta[1]**2*(1-cor**2) for i in range(len(n_samples))], label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
@@ -706,7 +710,7 @@ plt.subplots_adjust(right=0.75)
 
 plt.ylabel(r'Importance of $X_1$')
 plt.xlabel(r'Number of samples')
-plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-n-lineplt1.pdf", bbox_inches="tight")
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-Bias-diff-n-lineplt1.pdf", bbox_inches="tight")
 plt.show()
 
 
@@ -738,7 +742,7 @@ plt.subplots_adjust(right=0.75)
 
 plt.ylabel(r'Importance of $X_5$')
 plt.xlabel(r'Number of samples')
-plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-n-lineplt5.pdf", bbox_inches="tight")
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-Bias-diff-n-lineplt5.pdf", bbox_inches="tight")
 plt.show()
 
 
@@ -769,7 +773,7 @@ plt.subplots_adjust(right=0.75)
 
 plt.ylabel(r'Importance of $X_6$')
 plt.xlabel(r'Number of samples')
-plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-n-lineplt6.pdf", bbox_inches="tight")
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-Bias-diff-n-lineplt6.pdf", bbox_inches="tight")
 plt.show()
 
 
