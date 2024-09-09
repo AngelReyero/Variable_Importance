@@ -654,9 +654,10 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt.
 # Display the first few rows of the DataFrame
 print(df.head())
 
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='n_samples',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='n_samples',y='imp_V0',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==0]
 plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
@@ -684,10 +685,11 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt.
 
 # Display the first few rows of the DataFrame
 print(df.head())
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 
 
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='n_samples',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='n_samples',y='imp_V1',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==1]
 plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
@@ -715,10 +717,11 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt.
 
 # Display the first few rows of the DataFrame
 print(df.head())
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 
 
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='n_samples',y='imp_V5',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='n_samples',y='imp_V5',hue='method',palette=palette) #,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==5]
 plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
@@ -747,9 +750,9 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt.
 # Display the first few rows of the DataFrame
 print(df.head())
 
-
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='n_samples',y='imp_V6',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='n_samples',y='imp_V6',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==6]
 plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
