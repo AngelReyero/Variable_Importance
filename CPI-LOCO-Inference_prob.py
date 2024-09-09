@@ -424,7 +424,7 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='n_samples',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(n_samples, [beta[0]**2*(1-cor**2) for i in range(len(n_samples))], label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
+plt.plot(n_samples, [beta[1]**2*(1-cor**2) for i in range(len(n_samples))], label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -439,7 +439,7 @@ plt.subplots_adjust(right=0.75)
 
 plt.ylabel(r'Importance of $X_1$')
 plt.xlabel(r'Number of samples')
-plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-n-lineplt0.pdf", bbox_inches="tight")
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-n-lineplt1.pdf", bbox_inches="tight")
 plt.show()
 
 
