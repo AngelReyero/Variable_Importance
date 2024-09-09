@@ -184,7 +184,7 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='intra_cor',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(np.linspace(0,0.9, 50), beta[0]**2*(1-np.linspace(0,0.9, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
+plt.plot(np.linspace(0,0.85, 50), beta[0]**2*(1-np.linspace(0,0.85, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -213,7 +213,7 @@ print(df.head())
 
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='intra_cor',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
-plt.plot(np.linspace(0,0.9, 50), beta[1]**2*(1-np.linspace(0,0.9, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
+plt.plot(np.linspace(0,0.85, 50), beta[1]**2*(1-np.linspace(0,0.85, 50)**2), label=r"$\beta^2_j(1-\rho^2)$",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
