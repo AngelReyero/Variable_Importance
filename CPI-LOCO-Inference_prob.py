@@ -228,7 +228,7 @@ plt.subplots_adjust(right=0.75)
 
 plt.ylabel(r'Importance of $X_1$')
 plt.xlabel(r'Correlation')
-plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-corr-lineplt0.pdf", bbox_inches="tight")
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-corr-lineplt1.pdf", bbox_inches="tight")
 plt.show()
 
 
