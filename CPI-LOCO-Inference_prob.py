@@ -497,7 +497,7 @@ num_rep=3
 snr=4
 p=50
 cor=0.6
-n_samples=[30, 50, 100, 200, 300, 700]
+n_samples=[30, 50, 100, 200, 300, 700, 1000, 2000]
 imp2=np.zeros((4,num_rep, len(n_samples), p))# 4 because there is 4 methods
 pval2=np.zeros((4, len(n_samples), p))
  # Determine beta coefficients
@@ -506,7 +506,7 @@ n_cal=100
 
 interest_coord=[0, 1, 6, 7]
 #%%
-X,y=GenToysDataset(n=10000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
+X,y=GenToysDataset(n=100000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
 
 #LOCO asymptotically 
 ntrees = np.arange(100, 500, 100)
@@ -784,11 +784,11 @@ plt.show()
 #%%
 #Fourth EXPERIMENT: 
 #DATA
-num_rep=2#3
+num_rep=3
 snr=4
-p=10#50
-n=50#300
-intra_cor=[0.1, 0.3]#[0.05, 0.1, 0.3, 0.5, 0.8]
+p=50
+n=300
+intra_cor=[0.05, 0.1, 0.3, 0.5, 0.8]
 imp2=np.zeros((4,num_rep, len(intra_cor), p))# 4 because there is 4 methods
 pval2=np.zeros((4, len(intra_cor), p))
  # Determine beta coefficients
@@ -808,7 +808,7 @@ asymp_df=pd.DataFrame(asymp_df)
 for i_cor in range(len(intra_cor)):
     for j in range(len(interest_coord)):
         print("covariate: "+str(interest_coord[j]))
-        X,y=GenToysDataset(n=10000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=intra_cor[i_cor])
+        X,y=GenToysDataset(n=100000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=intra_cor[i_cor])
         asymp1={}
         vimp = vimpy.vim(y = y, x = X, s = j, pred_func = cv_full, measure_type = "r_squared")
         vimp.get_point_est()
@@ -836,8 +836,6 @@ for l in range(num_rep):
     for (i,cor) in enumerate(intra_cor):
         print("With cor="+str(cor))
         X,y=GenToysDataset(n=n, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
-
-        
 
         #LOCO robust
         
@@ -932,7 +930,7 @@ for l in range(num_rep):
             else:
                 f_res1["method"]=["Robust-CPI"]
             f_res1["cor"]=intra_cor[j]
-            for k in range(len(list(data.columns))):
+            for k in range(p):
                 f_res1["imp_V"+str(k)]=imp2[i,l, j, k]
                 f_res1["pval_V"+str(k)]=pval2[i, j, k]
             f_res1=pd.DataFrame(f_res1)
@@ -950,11 +948,11 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_
 # Display the first few rows of the DataFrame
 print(df.head())
 
-
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='cor',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='cor',y='imp_V0',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==0]
-plt.plot(asymp["intra_co"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+plt.plot(asymp["intra_cor"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -981,11 +979,11 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_
 # Display the first few rows of the DataFrame
 print(df.head())
 
-
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='cor',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='cor',y='imp_V1',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==1]
-plt.plot(asymp["intra_co"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+plt.plot(asymp["intra_cor"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1012,11 +1010,11 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_
 # Display the first few rows of the DataFrame
 print(df.head())
 
-
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='cor',y='imp_V5',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='cor',y='imp_V5',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==5]
-plt.plot(asymp["intra_co"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+plt.plot(asymp["intra_cor"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1043,11 +1041,11 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_
 # Display the first few rows of the DataFrame
 print(df.head())
 
-
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='cor',y='imp_V6',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='cor',y='imp_V6',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==6]
-plt.plot(asymp["intra_co"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+plt.plot(asymp["intra_cor"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1067,16 +1065,17 @@ plt.show()
 
 
 
-
+#%%
 #Fifth EXPERIMENT: 
 #DATA
-num_rep=2#3
+num_rep=3
 snr=4
-dim=[10, 20]#[10, 20, 35, 50, 100]
-n=50#300
+dim=[10, 20, 35, 50, 100]
+min_p=10
+n=300
 cor=0.6
-imp2=np.zeros((4,num_rep, len(dim), 2))# 4 because there is 4 methods
-pval2=np.zeros((4, len(dim), 2))
+imp2=np.zeros((4,num_rep, len(dim), min_p))# 4 because there is 4 methods
+pval2=np.zeros((4, len(dim), min_p))
  # Determine beta coefficients
 rng = np.random.RandomState(seed)
 n_cal=100
@@ -1106,7 +1105,7 @@ for i_p in range(len(dim)):
         asymp1["p_value"]=vimp.p_value_
         asymp1["coord"]=interest_coord[j]
         asymp1["d"]=dim[i_p]
-        asymp1=pd.DataFrame(asymp1)
+        asymp1=pd.DataFrame([asymp1])
         asymp_df=pd.concat([asymp_df, asymp1], ignore_index=True)
 
 
@@ -1143,8 +1142,10 @@ for l in range(num_rep):
             )
         bbi_model3.fit(X, y)
         res_CPI_Rob = bbi_model3.compute_importance()
-        imp2[3,l,i]=res_CPI_Rob["importance"].reshape((2,))*n_cal/(n_cal+1)
-        pval2[3,i]+=1/num_rep*res_CPI_Rob["pval"].reshape((2,))
+        intermediate_imp=res_CPI_Rob["importance"].reshape((p,))*n_cal/(n_cal+1)
+        imp2[3,l,i]=intermediate_imp[:min_p]
+        intermediate_pval=1/num_rep*res_CPI_Rob["pval"].reshape((p,))
+        pval2[3,i]+=intermediate_pval[:min_p]
 
 
         #Conditional
@@ -1162,8 +1163,10 @@ for l in range(num_rep):
             )
         bbi_model.fit(X, y)
         res_CPI = bbi_model.compute_importance()
-        imp2[0,l,i]=1/2*res_CPI["importance"].reshape((2,))
-        pval2[0,i]+=1/(2*num_rep)*res_CPI["pval"].reshape((2,))
+        intermed_imp=1/2*res_CPI["importance"].reshape((p,))
+        imp2[0,l,i]=intermed_imp[:min_p]
+        intermed_pval=1/(2*num_rep)*res_CPI["pval"].reshape((p,))
+        pval2[0,i]+=intermed_pval[:min_p]
         #PFI
         bbi_model2 = BlockBasedImportance(
                 estimator=None,
@@ -1179,15 +1182,17 @@ for l in range(num_rep):
             )
         bbi_model2.fit(X, y)
         res_PFI = bbi_model2.compute_importance()
-        imp2[1,l,i]=res_PFI["importance"].reshape((2,))
-        pval2[1,i]+=1/num_rep*res_PFI["pval"].reshape((2,))
+        intermed_imp=res_PFI["importance"].reshape((p,))
+        imp2[1,l,i]=intermed_imp[:min_p]
+        intermed_pval=1/num_rep*res_PFI["pval"].reshape((p,))
+        pval2[1,i]+=intermed_pval[:min_p]
         #LOCO
         ntrees = np.arange(100, 500, 100)
         lr = np.arange(.01, .1, .05)
         param_grid = [{'n_estimators':ntrees, 'learning_rate':lr}]
         ## set up cv objects
         cv_full = GridSearchCV(GradientBoostingRegressor(loss = 'squared_error', max_depth = 1), param_grid = param_grid, cv = 5, n_jobs=10)
-        for j in range(p):
+        for j in range(min_p):
             print("covariate: "+str(j))
             vimp = vimpy.vim(y = y, x = X, s = j, pred_func = cv_full, measure_type = "r_squared")
             vimp.get_point_est()
@@ -1218,7 +1223,7 @@ for l in range(num_rep):
             else:
                 f_res1["method"]=["Robust-CPI"]
             f_res1["d"]=dim[j]
-            for k in range(len(list(data.columns))):
+            for k in range(min_p):
                 f_res1["imp_V"+str(k)]=imp2[i,l, j, k]
                 f_res1["pval_V"+str(k)]=pval2[i, j, k]
             f_res1=pd.DataFrame(f_res1)
@@ -1236,9 +1241,10 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_
 # Display the first few rows of the DataFrame
 print(df.head())
 
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='d',y='imp_V0',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='d',y='imp_V0',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==0]
 plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
@@ -1267,9 +1273,9 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_
 # Display the first few rows of the DataFrame
 print(df.head())
 
-
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='cor',y='imp_V1',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='d',y='imp_V1',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==1]
 plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
@@ -1298,9 +1304,9 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_
 # Display the first few rows of the DataFrame
 print(df.head())
 
-
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='cor',y='imp_V5',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='d',y='imp_V5',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==5]
 plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
@@ -1329,9 +1335,9 @@ asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_
 # Display the first few rows of the DataFrame
 print(df.head())
 
-
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
-sns.lineplot(data=df,x='cor',y='imp_V6',hue='method')#,palette=palette,style='Regressor',markers=markers, dashes=dashes)
+sns.lineplot(data=df,x='d',y='imp_V6',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==6]
 plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
@@ -1367,3 +1373,5 @@ plt.show()
 
 
 
+
+# %%
