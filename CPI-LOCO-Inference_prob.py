@@ -497,7 +497,7 @@ num_rep=3
 snr=4
 p=50
 cor=0.6
-n_samples=[30, 50, 100, 200, 300, 700, 1000, 2000]
+n_samples=[50, 100, 200, 500, 1000, 2000]
 imp2=np.zeros((4,num_rep, len(n_samples), p))# 4 because there is 4 methods
 pval2=np.zeros((4, len(n_samples), p))
  # Determine beta coefficients
