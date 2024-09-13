@@ -808,7 +808,7 @@ asymp_df=pd.DataFrame(asymp_df)
 for i_cor in range(len(intra_cor)):
     for j in range(len(interest_coord)):
         print("covariate: "+str(interest_coord[j]))
-        X,y=GenToysDataset(n=100000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=intra_cor[i_cor])
+        X,y=GenToysDataset(n=10000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=intra_cor[i_cor])
         asymp1={}
         vimp = vimpy.vim(y = y, x = X, s = j, pred_func = cv_full, measure_type = "r_squared")
         vimp.get_point_est()
@@ -1081,6 +1081,7 @@ rng = np.random.RandomState(seed)
 n_cal=100
 
 interest_coord=[0, 1, 6, 7]
+#%%
 
 #LOCO asymptotically 
 ntrees = np.arange(100, 500, 100)
@@ -1093,7 +1094,7 @@ asymp_df=pd.DataFrame(asymp_df)
 for i_p in range(len(dim)):
     for j in range(len(interest_coord)):
         print("covariate: "+str(interest_coord[j]))
-        X,y=GenToysDataset(n=100000, d=dim[i_p], cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
+        X,y=GenToysDataset(n=100000, d=dim[i_p], cor='toep', y_method="imp1", k=2, mu=np.zeros(dim[i_p]), rho_toep=cor)
         asymp1={}
         vimp = vimpy.vim(y = y, x = X, s = j, pred_func = cv_full, measure_type = "r_squared")
         vimp.get_point_est()
@@ -1120,7 +1121,7 @@ for l in range(num_rep):
     print("Experiment: "+str(l))
     for (i,p) in enumerate(dim):
         print("With d="+str(p))
-        X,y=GenToysDataset(n=n, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
+        X,y=GenToysDataset(n=n, d=p, cor='toep', y_method="imp1", k=2, mu=np.zeros(p), rho_toep=cor)
 
         
 
