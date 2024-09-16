@@ -808,7 +808,7 @@ asymp_df=pd.DataFrame(asymp_df)
 for i_cor in range(len(intra_cor)):
     for j in range(len(interest_coord)):
         print("covariate: "+str(interest_coord[j]))
-        X,y=GenToysDataset(n=10000, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=intra_cor[i_cor])
+        X,y=GenToysDataset(n=10000, d=p, cor='toep', y_method="imp1", k=2, mu=np.zeros(p), rho_toep=intra_cor[i_cor])
         asymp1={}
         vimp = vimpy.vim(y = y, x = X, s = j, pred_func = cv_full, measure_type = "r_squared")
         vimp.get_point_est()
@@ -825,7 +825,7 @@ for i_cor in range(len(intra_cor)):
 
 
 asymp_df.to_csv(
-    f"results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor.csv",
+    f"results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_cent.csv",
     index=False,
 ) 
 
@@ -835,7 +835,7 @@ for l in range(num_rep):
     print("Experiment: "+str(l))
     for (i,cor) in enumerate(intra_cor):
         print("With cor="+str(cor))
-        X,y=GenToysDataset(n=n, d=p, cor='toep', y_method="imp1", k=2, mu=None, rho_toep=cor)
+        X,y=GenToysDataset(n=n, d=p, cor='toep', y_method="imp1", k=2, mu=np.zeros(p), rho_toep=cor)
 
         #LOCO robust
         
@@ -936,7 +936,7 @@ for l in range(num_rep):
             f_res1=pd.DataFrame(f_res1)
             f_res=pd.concat([f_res, f_res1], ignore_index=True)
 f_res.to_csv(
-    f"results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_cor_lineplt.csv",
+    f"results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_cor_lineplt_cent.csv",
     index=False,
 ) 
 print(f_res.head())
