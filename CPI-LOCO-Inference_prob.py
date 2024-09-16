@@ -1063,7 +1063,113 @@ plt.xlabel(r'Correlation')
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt6.pdf", bbox_inches="tight")
 plt.show()
 
+#%%
 
+df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_cor_lineplt_cent.csv")
+# Display the first few rows of the DataFrame
+print(df.head())
+
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
+sns.set(rc={'figure.figsize':(4,4)})
+sns.lineplot(data=df,x='cor',y='imp_V0',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
+
+
+plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+
+plt.subplots_adjust(right=0.75)
+
+#plt.xscale('log')
+#plt.yscale('log')
+
+
+plt.ylabel(r'Importance of $X_0$')
+plt.xlabel(r'Correlation')
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-diff-cor-lineplt0_cent.pdf", bbox_inches="tight")
+plt.show()
+
+
+#%%
+
+df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_cor_lineplt_cent.csv")
+
+# Display the first few rows of the DataFrame
+print(df.head())
+
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
+sns.set(rc={'figure.figsize':(4,4)})
+sns.lineplot(data=df,x='cor',y='imp_V1',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
+
+#plt.ylim((1e-2,1e3))
+#plt.legend()
+
+#plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend().remove()
+plt.subplots_adjust(right=0.75)
+
+#plt.xscale('log')
+#plt.yscale('log')
+
+
+plt.ylabel(r'Importance of $X_1$')
+plt.xlabel(r'Correlation')
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt1_cent.pdf", bbox_inches="tight")
+plt.show()
+
+
+#%%
+
+df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_cor_lineplt_cent.csv")
+
+# Display the first few rows of the DataFrame
+print(df.head())
+
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
+sns.set(rc={'figure.figsize':(4,4)})
+sns.lineplot(data=df,x='cor',y='imp_V5',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
+
+#plt.ylim((1e-2,1e3))
+#plt.legend()
+
+#plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend().remove()
+plt.subplots_adjust(right=0.75)
+
+#plt.xscale('log')
+#plt.yscale('log')
+
+
+plt.ylabel(r'Importance of $X_5$')
+plt.xlabel(r'Correlation')
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt5_cent.pdf", bbox_inches="tight")
+plt.show()
+
+
+#%%
+
+df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_cor_lineplt_cent.csv")
+
+# Display the first few rows of the DataFrame
+print(df.head())
+
+palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
+sns.set(rc={'figure.figsize':(4,4)})
+sns.lineplot(data=df,x='cor',y='imp_V6',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
+
+#plt.ylim((1e-2,1e3))
+#plt.legend()
+
+#plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend().remove()
+plt.subplots_adjust(right=0.75)
+
+#plt.xscale('log')
+#plt.yscale('log')
+
+
+plt.ylabel(r'Importance of $X_6$')
+plt.xlabel(r'Correlation')
+plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt6_cent.pdf", bbox_inches="tight")
+plt.show()
 
 #%%
 #Fifth EXPERIMENT: 
@@ -1248,6 +1354,9 @@ sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='d',y='imp_V0',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==0]
 plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
+
+
+plt.plot(asymp["d"], 1-(cor**2-cor**(2*(asymp["d"]))/(1-cor)), label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
