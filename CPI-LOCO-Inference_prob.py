@@ -1356,7 +1356,7 @@ asymp=asymp[asymp["coord"]==0]
 plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="black")
 
 
-plt.plot(asymp["d"], 1-(cor**2-cor**(2*(asymp["d"]))/(1-cor)), label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
+plt.plot(asymp["d"],[(1-cor**2)/2 for i in range(len(asymp["d"]))], label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1485,3 +1485,92 @@ plt.show()
 
 
 # %%
+n=100
+dim=[10, 20]#, 35, 50, 100]
+interest_coord=[0, 1, 6, 7]
+asymp_df={}
+asymp_df=pd.DataFrame(asymp_df)
+for i_p in range(len(dim)):
+    X,y=GenToysDataset(n=n, d=dim[i_p], cor='toep', y_method="imp1", k=2, mu=np.zeros(dim[i_p]), rho_toep=cor)
+    gb_param_grid = {
+    'n_estimators': [100, 300],  
+    'learning_rate': [0.01, 0.1], 
+    'max_depth': [3, 7], 
+    'min_samples_split': [2, 10],  
+    'min_samples_leaf': [1, 4],
+    'subsample': [0.8, 1.0], 
+    'loss': ['squared_error', 'huber']  
+}
+    bbi_model3 = BlockBasedImportance(
+                estimator=GradientBoostingRegressor(),
+                do_hyper=True,
+                importance_estimator=None,
+                dict_hyper=gb_param_grid,
+                conditional=True,
+                group_stacking=False,
+                n_perm=100,
+                n_jobs=10,
+                prob_type="regression",
+                k_fold=2,
+                robust=True,
+                n_cal=n_cal,
+            )
+    bbi_model3.fit(X, y)
+    res_CPI_Rob = bbi_model3.compute_importance()
+    intermediate_imp=res_CPI_Rob["importance"].reshape((dim[i_p],))*n_cal/(n_cal+1)
+    intermediate_pval=1/num_rep*res_CPI_Rob["pval"].reshape((dim[i_p],))
+    for i in interest_coord:
+        asymp1={}
+        asymp1["LOCO"]=intermediate_imp[i]
+        asymp1["p_value"]=intermediate_pval[i]
+        asymp1["coord"]=i
+        asymp1["d"]=dim[i_p]
+        asymp1=pd.DataFrame([asymp1])
+        asymp_df=pd.concat([asymp_df, asymp1], ignore_index=True)
+
+
+asymp_df.to_csv(
+    f"results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d_robust.csv",
+    index=False,
+) 
+
+#%%
+
+n=100
+dim=[10, 20]#, 35, 50, 100]
+interest_coord=[0, 1, 6, 7]
+asymp_df={}
+asymp_df=pd.DataFrame(asymp_df)
+for i_p in range(len(dim)):
+    X,y=GenToysDataset(n=n, d=dim[i_p], cor='toep', y_method="imp1", k=2, mu=np.zeros(dim[i_p]), rho_toep=cor)
+    #Conditional
+    bbi_model = BlockBasedImportance(
+            estimator=None,
+            do_hyper=True,
+            importance_estimator=None,
+            dict_hyper=None,
+            conditional=True,
+            group_stacking=False,
+            n_perm=100,
+            n_jobs=10,
+            prob_type="regression",
+            k_fold=2,
+        )
+    bbi_model.fit(X, y)
+    res_CPI = bbi_model.compute_importance()
+    intermediate_imp=res_CPI["importance"].reshape((dim[i_p],))*0.5
+    intermediate_pval=1/num_rep*res_CPI["pval"].reshape((dim[i_p],))
+    for i in interest_coord:
+        asymp1={}
+        asymp1["LOCO"]=intermediate_imp[i]
+        asymp1["p_value"]=intermediate_pval[i]
+        asymp1["coord"]=i
+        asymp1["d"]=dim[i_p]
+        asymp1=pd.DataFrame([asymp1])
+        asymp_df=pd.concat([asymp_df, asymp1], ignore_index=True)
+
+
+asymp_df.to_csv(
+    f"results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d_05CPI.csv",
+    index=False,
+) 
