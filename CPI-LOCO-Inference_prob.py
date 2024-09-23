@@ -1485,8 +1485,8 @@ plt.show()
 
 
 # %%
-n=100
-dim=[10, 20]#, 35, 50, 100]
+n=5000
+dim=[10, 20, 35, 50, 100]
 interest_coord=[0, 1, 6, 7]
 asymp_df={}
 asymp_df=pd.DataFrame(asymp_df)
