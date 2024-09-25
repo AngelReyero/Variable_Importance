@@ -1346,7 +1346,7 @@ print(f_res.head())
 df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_d_lineplt.csv")
 asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d.csv")
 asymp_rob=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d_robust.csv")
-# Display the first few rows of the DataFrame
+asymp_cpi=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d_05CPI.csv")
 print(df.head())
 
 palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
@@ -1358,6 +1358,8 @@ plt.plot(asymp["d"], asymp["LOCO"], label=r"AsymptoticLOCO",linestyle='--', line
 asymp_rob=asymp_rob[asymp_rob["coord"]==0]
 
 plt.plot(asymp_rob["d"], asymp_rob["LOCO"], label=r"AsymptoticRob",linestyle='--', linewidth=1, color="purple")
+asymp_cpi=asymp_cpi[asymp_cpi["coord"]==0]
+plt.plot(asymp_cpi["d"], asymp_cpi["LOCO"], label=r"AsymptoticCPI",linestyle='--', linewidth=1, color="blue")
 
 plt.plot(asymp["d"],[(1-cor**2)/2 for i in range(len(asymp["d"]))], label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
 
@@ -1383,6 +1385,7 @@ plt.show()
 df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_d_lineplt.csv")
 asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d.csv")
 asymp_rob=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d_robust.csv")
+asymp_cpi=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d_05CPI.csv")
 
 # Display the first few rows of the DataFrame
 print(df.head())
@@ -1395,6 +1398,18 @@ plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidt
 asymp_rob=asymp_rob[asymp_rob["coord"]==1]
 
 plt.plot(asymp_rob["d"], asymp_rob["LOCO"], label=r"AsymptoticRob",linestyle='--', linewidth=1, color="purple")
+asymp_cpi=asymp_cpi[asymp_cpi["coord"]==1]
+plt.plot(asymp_cpi["d"], asymp_cpi["LOCO"], label=r"AsymptoticCPI",linestyle='--', linewidth=1, color="blue")
+theo=[]
+for d in asymp["d"]:
+    mat=toep(d, cor)
+    sigma_1=mat[1]
+    sigma_1=np.delete(sigma_1, 1)
+    inv=np.delete(mat, 1, axis=0)
+    inv=np.delete(inv, 1, axis=1)
+    inv=np.linalg.inv(inv)
+    theo.append((1-np.dot(np.dot(sigma_1,inv), sigma_1.T))*0.5)
+plt.plot(asymp["d"],theo, label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1418,6 +1433,7 @@ plt.show()
 df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_d_lineplt.csv")
 asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d.csv")
 asymp_rob=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d_robust.csv")
+asymp_cpi=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d_05CPI.csv")
 
 # Display the first few rows of the DataFrame
 print(df.head())
@@ -1430,6 +1446,8 @@ plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidt
 asymp_rob=asymp_rob[asymp_rob["coord"]==5]
 
 plt.plot(asymp_rob["d"], asymp_rob["LOCO"], label=r"AsymptoticRob",linestyle='--', linewidth=1, color="purple")
+asymp_cpi=asymp_cpi[asymp_cpi["coord"]==5]
+plt.plot(asymp_cpi["d"], asymp_cpi["LOCO"], label=r"AsymptoticCPI",linestyle='--', linewidth=1, color="blue")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1453,7 +1471,7 @@ plt.show()
 df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_d_lineplt.csv")
 asymp=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d.csv")
 asymp_rob=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d_robust.csv")
-
+asymp_cpi=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_d_05CPI.csv")
 # Display the first few rows of the DataFrame
 print(df.head())
 
@@ -1463,8 +1481,9 @@ sns.lineplot(data=df,x='d',y='imp_V6',hue='method',palette=palette)#,style='Regr
 asymp=asymp[asymp["coord"]==6]
 plt.plot(asymp["d"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', linewidth=1, color="green")
 asymp_rob=asymp_rob[asymp_rob["coord"]==6]
-
 plt.plot(asymp_rob["d"], asymp_rob["LOCO"], label=r"AsymptoticRob",linestyle='--', linewidth=1, color="purple")
+asymp_cpi=asymp_cpi[asymp_cpi["coord"]==6]
+plt.plot(asymp_cpi["d"], asymp_cpi["LOCO"], label=r"AsymptoticCPI",linestyle='--', linewidth=1, color="blue")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
