@@ -829,6 +829,99 @@ asymp_df.to_csv(
     index=False,
 ) 
 
+# %%
+n=10000
+intra_cor=[0.05, 0.1, 0.3, 0.5, 0.8]
+interest_coord=[0, 1, 6, 7]
+asymp_df={}
+asymp_df=pd.DataFrame(asymp_df)
+for i_p in range(len(intra_cor)):
+    X,y=GenToysDataset(n=n, d=p, cor='toep', y_method="imp1", k=2, mu=np.zeros(p), rho_toep=intra_cor[i_p])
+    gb_param_grid = {
+    'n_estimators': [100, 300],  
+    'learning_rate': [0.01, 0.1], 
+    'max_depth': [3, 7], 
+    'min_samples_split': [2, 10],  
+    'min_samples_leaf': [1, 4],
+    'subsample': [0.8, 1.0], 
+    'loss': ['squared_error', 'huber']  
+}
+    bbi_model3 = BlockBasedImportance(
+                estimator=GradientBoostingRegressor(),
+                do_hyper=True,
+                importance_estimator=None,
+                dict_hyper=gb_param_grid,
+                conditional=True,
+                group_stacking=False,
+                n_perm=100,
+                n_jobs=10,
+                prob_type="regression",
+                k_fold=2,
+                robust=True,
+                n_cal=n_cal,
+            )
+    bbi_model3.fit(X, y)
+    res_CPI_Rob = bbi_model3.compute_importance()
+    intermediate_imp=res_CPI_Rob["importance"].reshape((p,))*n_cal/(n_cal+1)
+    intermediate_pval=1/num_rep*res_CPI_Rob["pval"].reshape((p,))
+    for i in interest_coord:
+        asymp1={}
+        asymp1["LOCO"]=intermediate_imp[i]
+        asymp1["p_value"]=intermediate_pval[i]
+        asymp1["coord"]=i
+        asymp1["intra_cor"]=intra_cor[i_p]
+        asymp1=pd.DataFrame([asymp1])
+        asymp_df=pd.concat([asymp_df, asymp1], ignore_index=True)
+
+
+asymp_df.to_csv(
+    f"results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_robust.csv",
+    index=False,
+) 
+
+#%%
+
+n=10000
+intra_cor=[0.05, 0.1, 0.3, 0.5, 0.8]
+interest_coord=[0, 1, 6, 7]
+asymp_df={}
+asymp_df=pd.DataFrame(asymp_df)
+for i_p in range(len(intra_cor)):
+    X,y=GenToysDataset(n=n, d=p, cor='toep', y_method="imp1", k=2, mu=np.zeros(p), rho_toep=intra_cor[i_p])
+    #Conditional
+    bbi_model = BlockBasedImportance(
+            estimator=None,
+            do_hyper=True,
+            importance_estimator=None,
+            dict_hyper=None,
+            conditional=True,
+            group_stacking=False,
+            n_perm=100,
+            n_jobs=10,
+            prob_type="regression",
+            k_fold=2,
+        )
+    bbi_model.fit(X, y)
+    res_CPI = bbi_model.compute_importance()
+    intermediate_imp=res_CPI["importance"].reshape((p,))*0.5
+    intermediate_pval=1/num_rep*res_CPI["pval"].reshape((p,))
+    for i in interest_coord:
+        asymp1={}
+        asymp1["LOCO"]=intermediate_imp[i]
+        asymp1["p_value"]=intermediate_pval[i]
+        asymp1["coord"]=i
+        asymp1["intra_cor"]=intra_cor[i_p]
+        asymp1=pd.DataFrame([asymp1])
+        asymp_df=pd.concat([asymp_df, asymp1], ignore_index=True)
+
+
+asymp_df.to_csv(
+    f"results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_05CPI.csv",
+    index=False,
+) 
+
+# %%
+
 
 #%%
 for l in range(num_rep):
@@ -1066,13 +1159,23 @@ plt.show()
 #%%
 
 df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_cor_lineplt_cent.csv")
-# Display the first few rows of the DataFrame
+asymp_loco=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_cent.csv")
+asymp_rob=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_robust.csv")
+asymp_cpi=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_05CPI.csv")
+
 print(df.head())
 
 palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='cor',y='imp_V0',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 
+asymp_loco=asymp_loco[asymp_loco["coord"]==0]
+plt.plot(asymp_loco["intra_cor"], asymp_loco["LOCO"], label=r"AsymptoticLOCO",linestyle='--', linewidth=1, color="green")
+asymp_rob=asymp_rob[asymp_rob["coord"]==0]
+plt.plot(asymp_rob["intra_cor"], asymp_rob["LOCO"], label=r"AsymptoticRob",linestyle='--', linewidth=1, color="purple")
+asymp_cpi=asymp_cpi[asymp_cpi["coord"]==0]
+plt.plot(asymp_cpi["intra_cor"], asymp_cpi["LOCO"], label=r"AsymptoticCPI",linestyle='--', linewidth=1, color="blue")
+plt.plot(asymp_loco["intra_cor"],[(1-cor**2)/2 for cor in asymp_loco["intra_cor"]], label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
 
 plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
 
@@ -1091,6 +1194,9 @@ plt.show()
 #%%
 
 df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_cor_lineplt_cent.csv")
+asymp_loco=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_cent.csv")
+asymp_rob=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_robust.csv")
+asymp_cpi=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_05CPI.csv")
 
 # Display the first few rows of the DataFrame
 print(df.head())
@@ -1098,6 +1204,23 @@ print(df.head())
 palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='cor',y='imp_V1',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
+
+asymp_loco=asymp_loco[asymp_loco["coord"]==1]
+plt.plot(asymp_loco["intra_cor"], asymp_loco["LOCO"], label=r"AsymptoticLOCO",linestyle='--', linewidth=1, color="green")
+asymp_rob=asymp_rob[asymp_rob["coord"]==1]
+plt.plot(asymp_rob["intra_cor"], asymp_rob["LOCO"], label=r"AsymptoticRob",linestyle='--', linewidth=1, color="purple")
+asymp_cpi=asymp_cpi[asymp_cpi["coord"]==1]
+plt.plot(asymp_cpi["intra_cor"], asymp_cpi["LOCO"], label=r"AsymptoticCPI",linestyle='--', linewidth=1, color="blue")
+theo=[]
+for cor in asymp_loco["intra_cor"]:
+    mat=toep(p, cor)
+    sigma_1=mat[1]
+    sigma_1=np.delete(sigma_1, 1)
+    inv=np.delete(mat, 1, axis=0)
+    inv=np.delete(inv, 1, axis=1)
+    inv=np.linalg.inv(inv)
+    theo.append((1-np.dot(np.dot(sigma_1,inv), sigma_1.T))*0.5)
+plt.plot(asymp_loco["intra_cor"],theo, label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1119,6 +1242,9 @@ plt.show()
 #%%
 
 df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_cor_lineplt_cent.csv")
+asymp_loco=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_cent.csv")
+asymp_rob=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_robust.csv")
+asymp_cpi=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_05CPI.csv")
 
 # Display the first few rows of the DataFrame
 print(df.head())
@@ -1126,6 +1252,14 @@ print(df.head())
 palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='cor',y='imp_V5',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
+
+asymp_loco=asymp_loco[asymp_loco["coord"]==5]
+plt.plot(asymp_loco["intra_cor"], asymp_loco["LOCO"], label=r"AsymptoticLOCO",linestyle='--', linewidth=1, color="green")
+asymp_rob=asymp_rob[asymp_rob["coord"]==5]
+plt.plot(asymp_rob["intra_cor"], asymp_rob["LOCO"], label=r"AsymptoticRob",linestyle='--', linewidth=1, color="purple")
+asymp_cpi=asymp_cpi[asymp_cpi["coord"]==5]
+plt.plot(asymp_cpi["intra_cor"], asymp_cpi["LOCO"], label=r"AsymptoticCPI",linestyle='--', linewidth=1, color="blue")
+plt.plot(asymp_loco["intra_cor"],[0 for i in asymp_loco["intra_cor"]], label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1147,6 +1281,9 @@ plt.show()
 #%%
 
 df = pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-diff_cor_lineplt_cent.csv")
+asymp_loco=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_cent.csv")
+asymp_rob=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_robust.csv")
+asymp_cpi=pd.read_csv("results/results_csv_Angel/simulation_CPI-LOCO-highDim-asympt_cor_05CPI.csv")
 
 # Display the first few rows of the DataFrame
 print(df.head())
@@ -1154,6 +1291,14 @@ print(df.head())
 palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'orange', "LOCO-AC": "red"}
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='cor',y='imp_V6',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
+
+asymp_loco=asymp_loco[asymp_loco["coord"]==6]
+plt.plot(asymp_loco["intra_cor"], asymp_loco["LOCO"], label=r"AsymptoticLOCO",linestyle='--', linewidth=1, color="green")
+asymp_rob=asymp_rob[asymp_rob["coord"]==6]
+plt.plot(asymp_rob["intra_cor"], asymp_rob["LOCO"], label=r"AsymptoticRob",linestyle='--', linewidth=1, color="purple")
+asymp_cpi=asymp_cpi[asymp_cpi["coord"]==6]
+plt.plot(asymp_cpi["intra_cor"], asymp_cpi["LOCO"], label=r"AsymptoticCPI",linestyle='--', linewidth=1, color="blue")
+plt.plot(asymp_loco["intra_cor"],[0 for i in asymp_loco["intra_cor"]], label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
@@ -1174,11 +1319,11 @@ plt.show()
 #%%
 #Fifth EXPERIMENT: 
 #DATA
-num_rep=3
+num_rep=10
 snr=4
 dim=[10, 20, 35, 50, 100]
 min_p=10
-n=300
+n=1000
 cor=0.6
 imp2=np.zeros((4,num_rep, len(dim), min_p))# 4 because there is 4 methods
 pval2=np.zeros((4, len(dim), min_p))
@@ -1230,14 +1375,22 @@ for l in range(num_rep):
         X,y=GenToysDataset(n=n, d=p, cor='toep', y_method="imp1", k=2, mu=np.zeros(p), rho_toep=cor)
 
         
-
+        gb_param_grid = {
+            'n_estimators': [100, 300],  
+            'learning_rate': [0.01, 0.1], 
+            'max_depth': [3, 7], 
+            'min_samples_split': [2, 10],  
+            'min_samples_leaf': [1, 4],
+            'subsample': [0.8, 1.0], 
+            'loss': ['squared_error', 'huber']  
+        }
         #LOCO robust
         
         bbi_model3 = BlockBasedImportance(
-                estimator=None,
+                estimator=GradientBoostingRegressor(),
                 do_hyper=True,
                 importance_estimator=None,
-                dict_hyper=None,
+                dict_hyper=gb_param_grid,
                 conditional=True,
                 group_stacking=False,
                 n_perm=100,
@@ -1257,10 +1410,10 @@ for l in range(num_rep):
 
         #Conditional
         bbi_model = BlockBasedImportance(
-                estimator=None,
+                estimator=GradientBoostingRegressor(),
                 do_hyper=True,
                 importance_estimator=None,
-                dict_hyper=None,
+                dict_hyper=gb_param_grid,
                 conditional=True,
                 group_stacking=False,
                 n_perm=100,
