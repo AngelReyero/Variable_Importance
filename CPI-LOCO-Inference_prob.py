@@ -190,7 +190,7 @@ plt.plot(np.linspace(0,0.85, 50), beta[0]**2*(1-np.linspace(0,0.85, 50)**2), lab
 #plt.ylim((1e-2,1e3))
 #plt.legend()
 
-plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0., fontsize=15)
 
 plt.subplots_adjust(right=0.75)
 
@@ -198,8 +198,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_0$')
-plt.xlabel(r'Correlation')
+plt.ylabel(r'Importance of $X_0$',fontsize=15 )
+plt.xlabel(r'Correlation',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-corr-lineplt0.pdf", bbox_inches="tight")
 plt.show()
 
@@ -228,8 +228,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_1$')
-plt.xlabel(r'Correlation')
+plt.ylabel(r'Importance of $X_1$', fontsize=15)
+plt.xlabel(r'Correlation',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-corr-lineplt1.pdf", bbox_inches="tight")
 plt.show()
 
@@ -403,7 +403,7 @@ plt.plot(n_samples, [beta[0]**2*(1-cor**2) for i in range(len(n_samples))], labe
 #plt.ylim((1e-2,1e3))
 #plt.legend()
 
-plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0., fontsize=15)
 
 plt.subplots_adjust(right=0.75)
 
@@ -411,8 +411,8 @@ plt.xscale('log')
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_0$')
-plt.xlabel(r'Number of samples')
+plt.ylabel(r'Importance of $X_0$', fontsize=15)
+plt.xlabel(r'Number of samples',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-n-lineplt0.pdf", bbox_inches="tight")
 plt.show()
 
@@ -441,8 +441,8 @@ plt.xscale('log')
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_1$')
-plt.xlabel(r'Number of samples')
+plt.ylabel(r'Importance of $X_1$', fontsize=15)
+plt.xlabel(r'Number of samples', fontsize=15)
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-n-lineplt1.pdf", bbox_inches="tight")
 plt.show()
 
@@ -668,16 +668,16 @@ plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asym
 #plt.ylim((1e-2,1e3))
 #plt.legend()
 
-plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.,fontsize=15 )
 
 plt.subplots_adjust(right=0.75)
 
-#plt.xscale('log')
+plt.xscale('log')
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_0$')
-plt.xlabel(r'Number of samples')
+plt.ylabel(r'Importance of $X_0$',fontsize=15 )
+plt.xlabel(r'Number of samples',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-diff-n-lineplt0.pdf", bbox_inches="tight")
 plt.show()
 
@@ -704,12 +704,12 @@ plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asym
 plt.legend().remove()
 plt.subplots_adjust(right=0.75)
 
-#plt.xscale('log')
+plt.xscale('log')
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_1$')
-plt.xlabel(r'Number of samples')
+plt.ylabel(r'Importance of $X_1$',fontsize=15 )
+plt.xlabel(r'Number of samples', fontsize=15)
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-Bias-diff-n-lineplt1.pdf", bbox_inches="tight")
 plt.show()
 
@@ -736,12 +736,12 @@ plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asym
 plt.legend().remove()
 plt.subplots_adjust(right=0.75)
 
-#plt.xscale('log')
+plt.xscale('log')
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_5$')
-plt.xlabel(r'Number of samples')
+plt.ylabel(r'Importance of $X_5$', fontsize=15)
+plt.xlabel(r'Number of samples',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-Bias-diff-n-lineplt5.pdf", bbox_inches="tight")
 plt.show()
 
@@ -767,12 +767,12 @@ plt.plot(n_samples, [asymp["LOCO"] for i in range(len(n_samples))], label=r"Asym
 plt.legend().remove()
 plt.subplots_adjust(right=0.75)
 
-#plt.xscale('log')
+plt.xscale('log')
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_6$')
-plt.xlabel(r'Number of samples')
+plt.ylabel(r'Importance of $X_6$',fontsize=15 )
+plt.xlabel(r'Number of samples',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-Bias-diff-n-lineplt6.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1050,7 +1050,7 @@ plt.plot(asymp["intra_cor"], asymp["LOCO"], label=r"Asymptotic",linestyle='--', 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
 
-plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0., fontsize=15)
 
 plt.subplots_adjust(right=0.75)
 
@@ -1058,8 +1058,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_0$')
-plt.xlabel(r'Correlation')
+plt.ylabel(r'Importance of $X_0$', fontsize=15)
+plt.xlabel(r'Correlation', fontsize=15)
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-diff-cor-lineplt0.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1089,8 +1089,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_1$')
-plt.xlabel(r'Correlation')
+plt.ylabel(r'Importance of $X_1$', fontsize=15)
+plt.xlabel(r'Correlation',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt1.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1120,8 +1120,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_5$')
-plt.xlabel(r'Correlation')
+plt.ylabel(r'Importance of $X_5$',fontsize=15 )
+plt.xlabel(r'Correlation', fontsize=15)
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt5.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1151,8 +1151,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_6$')
-plt.xlabel(r'Correlation')
+plt.ylabel(r'Importance of $X_6$', fontsize=15)
+plt.xlabel(r'Correlation',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt6.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1170,14 +1170,14 @@ sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='cor',y='imp_V0',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 
 asymp_loco=asymp_loco[asymp_loco["coord"]==0]
-plt.plot(asymp_loco["intra_cor"], asymp_loco["LOCO"], label=r"AsymptoticLOCO",linestyle='--', linewidth=1, color="green")
+plt.plot(asymp_loco["intra_cor"], asymp_loco["LOCO"], label=r"AsympLOCO",linestyle='--', linewidth=1, color="green")
 asymp_rob=asymp_rob[asymp_rob["coord"]==0]
-plt.plot(asymp_rob["intra_cor"], asymp_rob["LOCO"], label=r"AsymptoticRob",linestyle='--', linewidth=1, color="purple")
+plt.plot(asymp_rob["intra_cor"], asymp_rob["LOCO"], label=r"AsympRob",linestyle='--', linewidth=1, color="purple")
 asymp_cpi=asymp_cpi[asymp_cpi["coord"]==0]
-plt.plot(asymp_cpi["intra_cor"], asymp_cpi["LOCO"], label=r"AsymptoticCPI",linestyle='--', linewidth=1, color="blue")
+plt.plot(asymp_cpi["intra_cor"], asymp_cpi["LOCO"], label=r"AsympCPI",linestyle='--', linewidth=1, color="blue")
 plt.plot(asymp_loco["intra_cor"],[(1-cor**2)/2 for cor in asymp_loco["intra_cor"]], label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
 
-plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0., fontsize=15)
 
 plt.subplots_adjust(right=0.75)
 
@@ -1185,8 +1185,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_0$')
-plt.xlabel(r'Correlation')
+plt.ylabel(r'Importance of $X_0$', fontsize=15)
+plt.xlabel(r'Correlation', fontsize=15)
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-diff-cor-lineplt0_cent.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1233,8 +1233,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_1$')
-plt.xlabel(r'Correlation')
+plt.ylabel(r'Importance of $X_1$', fontsize=15)
+plt.xlabel(r'Correlation',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt1_cent.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1272,8 +1272,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_5$')
-plt.xlabel(r'Correlation')
+plt.ylabel(r'Importance of $X_5$', fontsize=15)
+plt.xlabel(r'Correlation', fontsize=15)
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt5_cent.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1311,8 +1311,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_6$')
-plt.xlabel(r'Correlation')
+plt.ylabel(r'Importance of $X_6$', fontsize=15)
+plt.xlabel(r'Correlation',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-cor-lineplt6_cent.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1507,19 +1507,19 @@ palette = {'Robust-CPI': 'purple', '0.5*CPI': 'blue', 'LOCO':'green', 'PFI':'ora
 sns.set(rc={'figure.figsize':(4,4)})
 sns.lineplot(data=df,x='d',y='imp_V0',hue='method',palette=palette)#,style='Regressor',markers=markers, dashes=dashes)
 asymp=asymp[asymp["coord"]==0]
-plt.plot(asymp["d"], asymp["LOCO"], label=r"AsymptoticLOCO",linestyle='--', linewidth=1, color="green")
+plt.plot(asymp["d"], asymp["LOCO"], label=r"AsympLOCO",linestyle='--', linewidth=1, color="green")
 asymp_rob=asymp_rob[asymp_rob["coord"]==0]
 
-plt.plot(asymp_rob["d"], asymp_rob["LOCO"], label=r"AsymptoticRob",linestyle='--', linewidth=1, color="purple")
+plt.plot(asymp_rob["d"], asymp_rob["LOCO"], label=r"AsympRob",linestyle='--', linewidth=1, color="purple")
 asymp_cpi=asymp_cpi[asymp_cpi["coord"]==0]
-plt.plot(asymp_cpi["d"], asymp_cpi["LOCO"], label=r"AsymptoticCPI",linestyle='--', linewidth=1, color="blue")
+plt.plot(asymp_cpi["d"], asymp_cpi["LOCO"], label=r"AsympCPI",linestyle='--', linewidth=1, color="blue")
 
 plt.plot(asymp["d"],[(1-cor**2)/2 for i in range(len(asymp["d"]))], label=r"Theoretical",linestyle='--', linewidth=2, color="gray")
 
 #plt.ylim((1e-2,1e3))
 #plt.legend()
 
-plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
+plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0., fontsize=15)
 
 plt.subplots_adjust(right=0.75)
 
@@ -1527,8 +1527,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_0$')
-plt.xlabel(r'Dimension')
+plt.ylabel(r'Importance of $X_0$', fontsize=15)
+plt.xlabel(r'Dimension',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-HighDim-diff-d-lineplt0.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1575,8 +1575,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_1$')
-plt.xlabel(r'Dimension')
+plt.ylabel(r'Importance of $X_1$',fontsize=15 )
+plt.xlabel(r'Dimension',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-d-lineplt1.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1613,8 +1613,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_5$')
-plt.xlabel(r'Dimension')
+plt.ylabel(r'Importance of $X_5$',fontsize=15 )
+plt.xlabel(r'Dimension',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-d-lineplt5.pdf", bbox_inches="tight")
 plt.show()
 
@@ -1649,8 +1649,8 @@ plt.subplots_adjust(right=0.75)
 #plt.yscale('log')
 
 
-plt.ylabel(r'Importance of $X_6$')
-plt.xlabel(r'Dimension')
+plt.ylabel(r'Importance of $X_6$',fontsize=15 )
+plt.xlabel(r'Dimension',fontsize=15 )
 plt.savefig("visualization/plots_Angel/simulation_CPI-LOCO-Bias-diff-d-lineplt6.pdf", bbox_inches="tight")
 plt.show()
 
