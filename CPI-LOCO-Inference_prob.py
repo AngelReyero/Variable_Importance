@@ -407,7 +407,7 @@ plt.legend(bbox_to_anchor=(-1.20, 0.5), loc='center left', borderaxespad=0.)
 
 plt.subplots_adjust(right=0.75)
 
-#plt.xscale('log')
+plt.xscale('log')
 #plt.yscale('log')
 
 
@@ -437,7 +437,7 @@ plt.plot(n_samples, [beta[1]**2*(1-cor**2) for i in range(len(n_samples))], labe
 plt.legend().remove()
 plt.subplots_adjust(right=0.75)
 
-#plt.xscale('log')
+plt.xscale('log')
 #plt.yscale('log')
 
 
